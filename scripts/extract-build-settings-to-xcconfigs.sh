@@ -38,12 +38,12 @@ printBuildSettings() {
         if [ "${configuration}" == "}" ];then
             continue
         fi
-        configurationName=$(print objects:$configuration:name)
         buildSettings=$(print objects:$configuration:buildSettings)
-        echo
+        configurationName=$(print objects:$configuration:name)
         FILEPREFIX=${targetName}-${configurationName}
-        echo "=== ${FILEPREFIX} ==="
-        echo $buildSettings | sed -f $SED_FILE > $XCCONFIG_OUT_DIR/$FILEPREFIX.xcconfig
+        FILENAME="${XCCONFIG_OUT_DIR}/${FILEPREFIX}.xcconfig"
+        echo "${FILENAME}"
+        echo $buildSettings | sed -f $SED_FILE > "${FILENAME}"
     done
 }
 
@@ -53,7 +53,6 @@ fi
 
 ROOTOBJ=`$plbuddy -c 'Print rootObject' ${XCODEPROJ}/project.pbxproj`
 
-echo "Base"
 printBuildSettings $(print objects:$ROOTOBJ:buildConfigurationList) Base
 targets=$(print objects:$ROOTOBJ:targets)
 for target in $targets
@@ -68,6 +67,5 @@ do
         continue
     fi
     targetName=$(print objects:$target:name)
-    echo "${targetName} (Native Target)"
     printBuildSettings $(print objects:$target:buildConfigurationList) $targetName
 done
