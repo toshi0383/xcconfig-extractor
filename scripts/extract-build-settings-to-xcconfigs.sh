@@ -15,12 +15,12 @@
 set -eo pipefail
 
 plbuddy='/usr/libexec/PlistBuddy'
-XCODEPROJ=${1:?}
+PBXPROJ=${1:?}
 XCCONFIG_OUT_DIR=${2:?}
 SED_FILE=$(cd $(dirname $0);pwd)/plbuddy-pretty.sed
 
 print() {
-    $plbuddy -c "Print ${1}" $XCODEPROJ
+    $plbuddy -c "Print ${1}" $PBXPROJ
 }
 
 printBuildSettings() {
@@ -51,7 +51,7 @@ if [ ! -d "${XCCONFIG_OUT_DIR}" ];then
     mkdir "${XCCONFIG_OUT_DIR}"
 fi
 
-ROOTOBJ=`$plbuddy -c 'Print rootObject' ${XCODEPROJ}/project.pbxproj`
+ROOTOBJ=`$plbuddy -c 'Print rootObject' ${PBXPROJ}`
 
 printBuildSettings $(print objects:$ROOTOBJ:buildConfigurationList) Base
 targets=$(print objects:$ROOTOBJ:targets)
