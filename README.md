@@ -5,7 +5,7 @@ Extract xcodeproj's buildSettings into separated xcconfig files
 I was so tired of refactoring every target's buildSettings into xcconfig manually.
 
 # Requirements
-- Xcode8+
+- Xcode8+ is officially supported, but should work against older ones too.
 
 # Usage
 ```
