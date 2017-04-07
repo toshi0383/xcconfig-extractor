@@ -6,7 +6,6 @@ I was so tired of refactoring every target's buildSettings into xcconfig manuall
 
 # Requirements
 - Xcode8+
-- iOS App Project
 
 # Usage
 ```
