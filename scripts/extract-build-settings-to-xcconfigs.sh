@@ -47,7 +47,7 @@ printBuildSettings() {
     done
 }
 
-if [ ! -f "${XCCONFIG_OUT_DIR}" ];then
+if [ ! -d "${XCCONFIG_OUT_DIR}" ];then
     mkdir "${XCCONFIG_OUT_DIR}"
 fi
 
