@@ -10,7 +10,7 @@ I was so tired of refactoring every target's buildSettings into xcconfig manuall
 # Usage
 ```
 cd your-app-directory/
-/path-to/xcconfig-extractor/script/main.sh App.xcodeproj Configuration/
+/path-to/xcconfig-extractor/script/main.sh App.xcodeproj/project.pbxproj Configuration/
 ```
 This will create xcconfig files under `Configuration` dir. Configurations are safely(awkly) removed from `buildSettings` section of pbxproj.
 
