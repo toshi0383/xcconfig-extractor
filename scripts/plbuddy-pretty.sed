@@ -11,6 +11,6 @@
 # copyright:
 #     Copyright © 2017 Toshihiro Suzuki. All rights reserved.
 #
-s/Dict {//; s/}//
+s/Dict {//g; s/ Array {//g; s/ }//g
 s/\(\ \)\([A-Z_]\{2,\} = \)/\
 \2/g
