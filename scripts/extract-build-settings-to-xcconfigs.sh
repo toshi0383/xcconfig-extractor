@@ -42,8 +42,7 @@ printBuildSettings() {
         configurationName=$(print objects:$configuration:name)
         FILEPREFIX=${targetName}-${configurationName}
         FILENAME="${XCCONFIG_OUT_DIR}/${FILEPREFIX}.xcconfig"
-        echo "${FILENAME}"
-        echo $buildSettings | sed -f $SED_FILE > "${FILENAME}"
+        echo $buildSettings | sed -f $SED_FILE | sed '/^ *$/d' > "${FILENAME}"
     done
 }
 
