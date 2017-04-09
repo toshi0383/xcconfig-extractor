@@ -11,15 +11,15 @@
 # copyright:
 #     Copyright © 2017 Toshihiro Suzuki. All rights reserved.
 #
-/\t\t\tbuildSettings/ {
+/[ \t][ \t]*buildSettings/ {
     B="filter"
     print $0
 }
-!/\t\t\tbuildSettings/ {
+!/[ \t][ \t]*buildSettings/ {
     if (B != "filter") {
         print $0
     } else {
-        if ($1 == "\t\t\t};") {
+        if ($1 == "\t\t\t};" || $1 == "         };") {
             B=""
             print $0
         }
