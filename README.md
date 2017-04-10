@@ -15,7 +15,7 @@ cd your-app-directory/
 This will create xcconfig files under `Configuration` dir. Configurations are safely(awkly) removed from `buildSettings` section of pbxproj.
 
 # TODOs
-- Add `#include`ing Base configs.
+- Filter Duplicated Lines
 - What else?🤔
 
 # License
