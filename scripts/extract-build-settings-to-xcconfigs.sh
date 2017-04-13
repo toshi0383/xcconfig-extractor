@@ -18,6 +18,7 @@ plbuddy='/usr/libexec/PlistBuddy'
 PBXPROJ=${1:?}
 XCCONFIG_OUT_DIR=${2:?}
 SED_FILE=$(cd $(dirname $0);pwd)/plbuddy-pretty.sed
+HEADER_MESSAGE="// Generated using xcconfig-extractor by Toshihiro Suzuki - https://github.com/toshi0383/xcconfig-extractor"
 
 print() {
     $plbuddy -c "Print ${1}" $PBXPROJ
@@ -42,7 +43,8 @@ printBuildSettings() {
         configurationName=$(print objects:$configuration:name)
         FILEPREFIX=${targetName}-${configurationName}
         FILENAME="${XCCONFIG_OUT_DIR}/${FILEPREFIX}.xcconfig"
-        echo $buildSettings | sed -f $SED_FILE | sed '/^ *$/d' > "${FILENAME}"
+        echo "${HEADER_MESSAGE}" > "${FILENAME}"
+        echo $buildSettings | sed -f $SED_FILE | sed '/^ *$/d' >> "${FILENAME}"
     done
 }
 
