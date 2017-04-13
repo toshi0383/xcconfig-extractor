@@ -44,7 +44,7 @@ printBuildSettings() {
         FILEPREFIX=${targetName}-${configurationName}
         FILENAME="${XCCONFIG_OUT_DIR}/${FILEPREFIX}.xcconfig"
         echo "${HEADER_MESSAGE}" > "${FILENAME}"
-        echo $buildSettings | sed -f $SED_FILE | sed '/^ *$/d' >> "${FILENAME}"
+        echo $buildSettings | sed -f $SED_FILE | sed '/^ *$/d' | sort >> "${FILENAME}"
     done
 }
 
