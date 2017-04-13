@@ -20,7 +20,7 @@ if [ $# -eq 0 ];then
     echo "    $(basename $0) [path to pbxproj] [output dir (defaults to '.')]"
     exit 1
 elif [ "$1" == "--version" ];then
-    echo "xcconfig-extractor 0.1.3"
+    echo "xcconfig-extractor 0.1.4"
     exit
 fi
 PBXPROJ=${1:?}
