@@ -39,17 +39,11 @@ struct Pbxproj {
         }
         self.rootObject = rootObjectKey
         self.objects = objects
-        guard let rootObject = objects[rootObjectKey] as? [String: Any] else {
-            fatalError("rootObject not found!")
-        }
-        guard let targetKeys = rootObject["targets"] as? [String] else {
-            fatalError("rootObject.targets not found!")
-        }
+        let rootObject = objects[rootObjectKey] as! [String: Any]
+        let targetKeys = rootObject["targets"] as! [String]
         self.targets = targetKeys.map { key in
-            let targetObject = objects[key] as! [String: Any]
-            let buildConfigurationListKey = targetObject["buildConfigurationList"] as! String
-            let buildConfigurationList = objects[buildConfigurationListKey] as! [String: Any]
-            return (buildConfigurationList, objects)
+            let target = objects[key] as! [String: Any]
+            return (target, objects)
         }.map(NativeTarget.init)
     }
     func object<T>(for key: String) -> T {

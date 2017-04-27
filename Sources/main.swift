@@ -11,6 +11,16 @@ import Commander
 import PathKit
 
 let version = "1.0.0"
+let header = ["// Generated using xcconfig-extractor \(version) by Toshihiro Suzuki - https://github.com/toshi0383/xcconfig-extractor"]
+
+class ResultObject {
+    let path: Path
+    var settings: [String]
+    init(path: Path, settings: [String]) {
+        self.path = path
+        self.settings = settings
+    }
+}
 
 let main = command(
     Argument<Path>("PATH", description: "xcodeproj file", validator: dirExists),
@@ -29,68 +39,55 @@ let main = command(
 
     // write
     let configurations = pbxproj.targets.flatMap { t in
-        t.buildConfigurations
+        t.buildConfigurationList.buildConfigurations
     }
     let configurationNames = Set(configurations.map { c in c.name })
     var eachCommonSettings = [String: [String: Any]]()
-    for name in configurationNames {
-        let configurationsForName = configurations.filter { $0.name == name }
-        var common = [String: Any]()
-        for c in configurationsForName {
-            if common.isEmpty {
-                common = c.buildSettings
-            } else {
-                for (k, v) in c.buildSettings {
-                    if let commonV = common[k], compare(commonV, v) {
-                        // stay
-                    } else {
-                        // remove
-                        common.removeValue(forKey: k)
-                    }
-                }
-            }
+    var results = [ResultObject]()
+    for target in pbxproj.targets {
+        let targetName = target.name
+        for configuration in target.buildConfigurationList.buildConfigurations {
+            let filePath = Path("\(dirPath.string)/\(targetName)_\(configuration.name).xcconfig")
+            let buildSettings = configuration.buildSettings
+            let lines = convertToLines(buildSettings)
+            results.append(ResultObject(path: filePath, settings: lines))
         }
-        eachCommonSettings[name] = common
     }
-    var baseCommonSettings = [String: Any]()
-    for (key, v) in eachCommonSettings {
-        if baseCommonSettings.isEmpty {
-            baseCommonSettings = v
+    let baseSettings: [String] = results.map { $0.settings }.reduce([]) { (acc: [String], values: [String]) -> [String] in
+        if acc.isEmpty {
+            return values
         } else {
-            for (kk, vv) in v {
-                if let commonV = baseCommonSettings[kk], compare(commonV, vv) {
-                    // stay on base, remove from each
-                    for keyy in eachCommonSettings.keys {
-                        eachCommonSettings[keyy]!.removeValue(forKey: kk)
-                    }
+            var r = acc
+            for i in (0..<r.count).reversed() {
+                let v = r[i]
+                if values.contains(v) {
+                    continue
                 } else {
-                    // remove from base
-                    baseCommonSettings.removeValue(forKey: kk)
+                    r.remove(at: r.index(of: v)!)
                 }
             }
+            return r
         }
     }
-    for v in eachCommonSettings {
-        print("==========================")
-        print(v)
+    for i in (0..<results.count) {
+        var settings = results[i].settings - baseSettings
+        results[i] = ResultObject(path: results[i].path, settings: settings)
     }
-    print("==========================")
-    print(baseCommonSettings)
-
-//    for (k, v) in taerget {
-//        print("\(k): \(v)")
-//        switch v {
-//        case is NSString:
-//        case is NSInteger:
-//            // Integer need to be parsed before Bool
-//        case is Bool:
-//        case is Date:
-//        case is Data:
-//        case is NSArray:
-//        case is [String: Any]:
-//        default:
-//        }
-//    }
+    let basexcconfig = "Base.xcconfig"
+    results.append(ResultObject(path: Path("\(dirPath.string)/\(basexcconfig)"), settings: baseSettings))
+    let formatted: [ResultObject] = results
+        .map { r in
+            (
+                r.path, r.path.components.last == basexcconfig ?
+                    format(r.settings) :
+                    format(r.settings, with: [basexcconfig])
+            )
+        }
+        .map(ResultObject.init)
+    for r in formatted {
+        let data = (r.settings.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
+        try r.path.write(data)
+    }
 }
 
 main.run(version)

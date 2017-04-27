@@ -41,3 +41,28 @@ func compare(_ l: Any, _ r: Any) -> Bool {
         return false
     }
 }
+
+func convertToLines(_ dictionary: [String: Any]) -> [String] {
+    let result = dictionary.map { (k, v) -> String in
+        switch v {
+        case let s as String:
+            return "\(k) = \(s)"
+        case let s as [String]:
+            return "\(k) = \(s.map{$0}.joined(separator: " "))"
+        case is [String: Any]:
+            fatalError("Unexpected Object. Please file an issue if you believe this as a bug.")
+        default:
+            fatalError("Unexpected Object. Please file an issue if you believe this as a bug.")
+        }
+    }
+    return result
+}
+
+func format(_ result: [String], with includes: [String] = []) -> [String] {
+    return header + includes.map {"#include \"\($0)\""} + result + ["\n"]
+}
+
+// MARK: Operators
+func -<T: Equatable>(l: [T], r: [T]) -> [T] {
+    return l.filter { t in r.contains(t) == false }
+}
