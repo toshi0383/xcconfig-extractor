@@ -10,6 +10,8 @@ import Foundation
 import Commander
 import PathKit
 
+let version = "1.0.0"
+
 let main = command(
     Argument<Path>("PATH", description: "xcodeproj file", validator: dirExists),
     Argument<Path>("DIR", description: "output directory")
@@ -91,4 +93,4 @@ let main = command(
 //    }
 }
 
-main.run()
+main.run(version)
