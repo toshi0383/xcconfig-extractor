@@ -68,37 +68,35 @@ let main = command(
 
     // Base.xcconfig
     if isTrimDuplicates {
-        let allResults = baseResults + targetResults
-        let baseSettings: [String] = allResults.map { $0.settings }.reduce([], filterCommon)
-
-        // Trim lines from each resultss
-        for i in (0..<baseResults.count) {
-            var settings = baseResults[i].settings - baseSettings
-            baseResults[i] = ResultObject(path: baseResults[i].path, settings: settings)
-        }
-        for i in (0..<targetResults.count) {
-            var settings = targetResults[i].settings - baseSettings
-            targetResults[i] = ResultObject(path: targetResults[i].path, settings: settings)
-        }
-        // Write Base.xcconfig
-        let basexcconfig = Path("\(dirPath.string)/Base.xcconfig")
-        try write(to: basexcconfig, settings: baseSettings)
-
+        var configurationNameResults = [ResultObject]()
         // Trim Duplicates in same configurationNames
         for configurationName in configurationNames {
             let filtered = (baseResults + targetResults)
-                .filter { $0.path.components.last!.contains(configurationName) }
-            let common = filtered.map { $0.settings }.reduce([], filterCommon)
-            try write(to: Path("\(dirPath)/\(configurationName)-Base.xcconfig"), settings: common, includes: ["Base.xcconfig"])
-            for result in filtered {
-                let settings = result.settings - common
-                if result.path.components.last == "\(configurationName).xcconfig" {
-                    try write(to: result.path, settings: settings, includes: ["\(configurationName)-Base.xcconfig"])
-                } else {
-                    try write(to: result.path, settings: settings)
+                .filter {
+                    $0.path.components.last!.contains(configurationName) &&
+                        $0.path.components.last != "\(configurationName).xcconfig"
                 }
+            let commonFromUpperLayer: [String] = filtered.map { $0.settings }.filterCommon()
+            // Write Upper Layer Configs (e.g. App-Debug.xcconfig, AppTests-Debug.xcconfig)
+            for result in filtered {
+                let settings = result.settings - commonFromUpperLayer
+                try write(to: result.path, settings: settings)
             }
+
+            configurationNameResults.append(baseResults.filter {
+                $0.path.components.last == "\(configurationName).xcconfig"
+            }.first!)
         }
+        // Trim Duplicates in configurationName configs (e.g. Debug.xcconfig and Release.xcconfig)
+        let commonBetweenConfigurationBases = configurationNameResults.map { $0.settings } .filterCommon()
+        // Write Configuration Base Configs (e.g. Debug.xcconfig, Release.xcconfig)
+        for result in configurationNameResults {
+            let settings = result.settings - commonBetweenConfigurationBases
+            try write(to: result.path, settings: settings, includes: ["Base.xcconfig"])
+        }
+        // Finally Write Base.xcconfig
+        let basexcconfig = Path("\(dirPath.string)/Base.xcconfig")
+        try write(to: basexcconfig, settings: commonBetweenConfigurationBases)
     } else {
         let formatted: [ResultObject] = (baseResults + targetResults)
             .map { r in ( r.path, format(r.settings)) }

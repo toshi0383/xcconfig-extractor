@@ -40,23 +40,6 @@ func compare(_ l: Any, _ r: Any) -> Bool {
     }
 }
 
-func filterCommon(acc: [String], values: [String]) -> [String] {
-    if acc.isEmpty {
-        return values
-    } else {
-        var r = acc
-        for i in (0..<r.count).reversed() {
-            let v = r[i]
-            if values.contains(v) {
-                continue
-            } else {
-                r.remove(at: i)
-            }
-        }
-        return r
-    }
-}
-
 func convertToLines(_ dictionary: [String: Any]) -> [String] {
     let result = dictionary.map { (k, v) -> String in
         switch v {
@@ -83,7 +66,35 @@ func write(to path: Path, settings: [String], includes: [String] = []) throws {
     try path.write(data)
 }
 
+extension Array where Element == [String] {
+    func filterCommon() -> [String] {
+        func _filterCommon(acc: [String]?, values: [String]) -> [String]? {
+            if acc == nil {
+                return values
+            } else {
+                var r = acc!
+                for i in (0..<r.count).reversed() {
+                    let v = r[i]
+                    if values.contains(v) {
+                        continue
+                    } else {
+                        r.remove(at: i)
+                    }
+                }
+                return r
+            }
+        }
+        return reduce(Optional<[String]>.none, _filterCommon)!
+    }
+}
+
 // MARK: Operators
+infix operator +|
+func +|<T: Equatable>(l: [T], r: [T]) -> [T] {
+    var o = l
+    o.append(contentsOf: r)
+    return o
+}
 func -<T: Equatable>(l: [T], r: [T]) -> [T] {
     return l.filter { t in r.contains(t) == false }
 }
