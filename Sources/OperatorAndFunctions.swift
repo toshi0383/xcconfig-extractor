@@ -9,9 +9,6 @@
 import Foundation
 import PathKit
 
-public func ==(lhs: [String: Any], rhs: [String: Any] ) -> Bool {
-    return NSDictionary(dictionary: lhs).isEqual(to: rhs)
-}
 func compare(_ l: Any, _ r: Any) -> Bool {
     switch l {
     case let ls as String:
@@ -53,7 +50,7 @@ func trimDuplicates(acc: [String], values: [String]) -> [String] {
             if values.contains(v) {
                 continue
             } else {
-                r.remove(at: r.index(of: v)!)
+                r.remove(at: i)
             }
         }
         return r
@@ -89,4 +86,8 @@ func write(to path: Path, settings: [String], with includes: [String] = []) thro
 // MARK: Operators
 func -<T: Equatable>(l: [T], r: [T]) -> [T] {
     return l.filter { t in r.contains(t) == false }
+}
+
+public func ==(lhs: [String: Any], rhs: [String: Any] ) -> Bool {
+    return NSDictionary(dictionary: lhs).isEqual(to: rhs)
 }

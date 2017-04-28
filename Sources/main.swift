@@ -67,8 +67,8 @@ let main = command(
     }
 
     // Base.xcconfig
-    let allResults = baseResults + targetResults
     if isTrimDuplicates {
+        let allResults = baseResults + targetResults
         let baseSettings: [String] = allResults.map { $0.settings }.reduce([], trimDuplicates)
 
         // Trim lines from each resultss
