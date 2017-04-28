@@ -13,9 +13,8 @@ struct Pbxproj {
     let archiveVersion: String
     let classes: [String: Any]
     let objectVersion: String
-    let rootObject: String
+    let rootObject: Project
     let objects: [String: Any]
-    let targets: [NativeTarget]
     fileprivate let raw: Any
     init?(data: Data) {
         var format = PropertyListSerialization.PropertyListFormat.xml
@@ -37,14 +36,9 @@ struct Pbxproj {
             else {
             fatalError("rootObject or objects not found!")
         }
-        self.rootObject = rootObjectKey
         self.objects = objects
-        let rootObject = objects[rootObjectKey] as! [String: Any]
-        let targetKeys = rootObject["targets"] as! [String]
-        self.targets = targetKeys.map { key in
-            let target = objects[key] as! [String: Any]
-            return (target, objects)
-        }.map(NativeTarget.init)
+        let rootObject = Project(objects[rootObjectKey] as! [String: Any], objects: objects)
+        self.rootObject = rootObject
     }
     func object<T>(for key: String) -> T {
         return objects[key] as! T

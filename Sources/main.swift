@@ -24,8 +24,10 @@ class ResultObject {
 
 let main = command(
     Argument<Path>("PATH", description: "xcodeproj file", validator: dirExists),
-    Argument<Path>("DIR", description: "output directory")
-) { pbxprojPath, dirPath in
+    Argument<Path>("DIR", description: "output directory"),
+    Flag("trim-duplicates", description: "extract duplicated lines to common xcconfigs.", default: true)
+) { pbxprojPath, dirPath, isTrimDuplicates in
+
     let path = pbxprojPath + Path("project.pbxproj")
     if dirPath.isDirectory == false {
         try! dirPath.mkdir()
@@ -38,55 +40,75 @@ let main = command(
     }
 
     // write
-    let configurations = pbxproj.targets.flatMap { t in
+    var results = [ResultObject]()
+
+    // base
+    for configuration in pbxproj.rootObject.buildConfigurationList.buildConfigurations {
+        let filePath = Path("\(dirPath.string)/Base-\(configuration.name).xcconfig")
+        let buildSettings = configuration.buildSettings
+        let lines = convertToLines(buildSettings)
+        results.append(ResultObject(path: filePath, settings: lines))
+    }
+
+    // targets
+    let configurations = pbxproj.rootObject.targets.flatMap { t in
         t.buildConfigurationList.buildConfigurations
     }
     let configurationNames = Set(configurations.map { c in c.name })
-    var eachCommonSettings = [String: [String: Any]]()
-    var results = [ResultObject]()
-    for target in pbxproj.targets {
+    for target in pbxproj.rootObject.targets {
         let targetName = target.name
         for configuration in target.buildConfigurationList.buildConfigurations {
-            let filePath = Path("\(dirPath.string)/\(targetName)_\(configuration.name).xcconfig")
+            let filePath = Path("\(dirPath.string)/\(targetName)-\(configuration.name).xcconfig")
             let buildSettings = configuration.buildSettings
             let lines = convertToLines(buildSettings)
             results.append(ResultObject(path: filePath, settings: lines))
         }
     }
-    let baseSettings: [String] = results.map { $0.settings }.reduce([]) { (acc: [String], values: [String]) -> [String] in
-        if acc.isEmpty {
-            return values
-        } else {
-            var r = acc
-            for i in (0..<r.count).reversed() {
-                let v = r[i]
-                if values.contains(v) {
-                    continue
-                } else {
-                    r.remove(at: r.index(of: v)!)
+
+    if isTrimDuplicates {
+        let baseSettings: [String] = results.map { $0.settings }.reduce([]) { (acc: [String], values: [String]) -> [String] in
+            if acc.isEmpty {
+                return values
+            } else {
+                var r = acc
+                for i in (0..<r.count).reversed() {
+                    let v = r[i]
+                    if values.contains(v) {
+                        continue
+                    } else {
+                        r.remove(at: r.index(of: v)!)
+                    }
                 }
+                return r
             }
-            return r
         }
-    }
-    for i in (0..<results.count) {
-        var settings = results[i].settings - baseSettings
-        results[i] = ResultObject(path: results[i].path, settings: settings)
-    }
-    let basexcconfig = "Base.xcconfig"
-    results.append(ResultObject(path: Path("\(dirPath.string)/\(basexcconfig)"), settings: baseSettings))
-    let formatted: [ResultObject] = results
-        .map { r in
-            (
-                r.path, r.path.components.last == basexcconfig ?
-                    format(r.settings) :
-                    format(r.settings, with: [basexcconfig])
-            )
+        for i in (0..<results.count) {
+            var settings = results[i].settings - baseSettings
+            results[i] = ResultObject(path: results[i].path, settings: settings)
         }
-        .map(ResultObject.init)
-    for r in formatted {
-        let data = (r.settings.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
-        try r.path.write(data)
+        let basexcconfig = "Base.xcconfig"
+        results.append(ResultObject(path: Path("\(dirPath.string)/\(basexcconfig)"), settings: baseSettings))
+        let formatted: [ResultObject] = results
+            .map { r in
+                (
+                    r.path, r.path.components.last == basexcconfig ?
+                        format(r.settings) :
+                        format(r.settings, with: [basexcconfig])
+                )
+            }
+            .map(ResultObject.init)
+        for r in formatted {
+            let data = (r.settings.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
+            try r.path.write(data)
+        }
+    } else {
+        let formatted: [ResultObject] = results
+            .map { r in ( r.path, format(r.settings)) }
+            .map(ResultObject.init)
+        for r in formatted {
+            let data = (r.settings.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
+            try r.path.write(data)
+        }
     }
 }
 
