@@ -89,9 +89,14 @@ let main = command(
             let filtered = (baseResults + targetResults)
                 .filter { $0.path.components.last!.contains(configurationName) }
             let common = filtered.map { $0.settings }.reduce([], trimDuplicates)
+            try write(to: Path("\(dirPath)/\(configurationName)-Base.xcconfig"), settings: common, with: ["Base.xcconfig"])
             for result in filtered {
                 let settings = result.settings - common
-                try write(to: result.path, settings: settings, with: ["\(configurationName).xcconfig"])
+                if result.path.components.last == "\(configurationName).xcconfig" {
+                    try write(to: result.path, settings: settings, with: ["\(configurationName)-Base.xcconfig"])
+                } else {
+                    try write(to: result.path, settings: settings)
+                }
             }
         }
     } else {
