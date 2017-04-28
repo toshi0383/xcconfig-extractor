@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import PathKit
 
 public func ==(lhs: [String: Any], rhs: [String: Any] ) -> Bool {
     return NSDictionary(dictionary: lhs).isEqual(to: rhs)
@@ -42,6 +43,23 @@ func compare(_ l: Any, _ r: Any) -> Bool {
     }
 }
 
+func trimDuplicates(acc: [String], values: [String]) -> [String] {
+    if acc.isEmpty {
+        return values
+    } else {
+        var r = acc
+        for i in (0..<r.count).reversed() {
+            let v = r[i]
+            if values.contains(v) {
+                continue
+            } else {
+                r.remove(at: r.index(of: v)!)
+            }
+        }
+        return r
+    }
+}
+
 func convertToLines(_ dictionary: [String: Any]) -> [String] {
     let result = dictionary.map { (k, v) -> String in
         switch v {
@@ -60,6 +78,12 @@ func convertToLines(_ dictionary: [String: Any]) -> [String] {
 
 func format(_ result: [String], with includes: [String] = []) -> [String] {
     return header + includes.map {"#include \"\($0)\""} + result + ["\n"]
+}
+
+func write(to path: Path, settings: [String], with includes: [String] = []) throws {
+    let formatted = format(settings, with: includes)
+    let data = (formatted.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
+    try path.write(data)
 }
 
 // MARK: Operators

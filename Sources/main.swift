@@ -40,14 +40,15 @@ let main = command(
     }
 
     // write
-    var results = [ResultObject]()
+    var baseResults = [ResultObject]()
+    var targetResults = [ResultObject]()
 
     // base
     for configuration in pbxproj.rootObject.buildConfigurationList.buildConfigurations {
-        let filePath = Path("\(dirPath.string)/Base-\(configuration.name).xcconfig")
+        let filePath = Path("\(dirPath.string)/\(configuration.name).xcconfig")
         let buildSettings = configuration.buildSettings
         let lines = convertToLines(buildSettings)
-        results.append(ResultObject(path: filePath, settings: lines))
+        baseResults.append(ResultObject(path: filePath, settings: lines))
     }
 
     // targets
@@ -61,48 +62,40 @@ let main = command(
             let filePath = Path("\(dirPath.string)/\(targetName)-\(configuration.name).xcconfig")
             let buildSettings = configuration.buildSettings
             let lines = convertToLines(buildSettings)
-            results.append(ResultObject(path: filePath, settings: lines))
+            targetResults.append(ResultObject(path: filePath, settings: lines))
         }
     }
 
+    // Base.xcconfig
+    let allResults = baseResults + targetResults
     if isTrimDuplicates {
-        let baseSettings: [String] = results.map { $0.settings }.reduce([]) { (acc: [String], values: [String]) -> [String] in
-            if acc.isEmpty {
-                return values
-            } else {
-                var r = acc
-                for i in (0..<r.count).reversed() {
-                    let v = r[i]
-                    if values.contains(v) {
-                        continue
-                    } else {
-                        r.remove(at: r.index(of: v)!)
-                    }
-                }
-                return r
-            }
+        let baseSettings: [String] = allResults.map { $0.settings }.reduce([], trimDuplicates)
+
+        // Trim lines from each resultss
+        for i in (0..<baseResults.count) {
+            var settings = baseResults[i].settings - baseSettings
+            baseResults[i] = ResultObject(path: baseResults[i].path, settings: settings)
         }
-        for i in (0..<results.count) {
-            var settings = results[i].settings - baseSettings
-            results[i] = ResultObject(path: results[i].path, settings: settings)
+        for i in (0..<targetResults.count) {
+            var settings = targetResults[i].settings - baseSettings
+            targetResults[i] = ResultObject(path: targetResults[i].path, settings: settings)
         }
-        let basexcconfig = "Base.xcconfig"
-        results.append(ResultObject(path: Path("\(dirPath.string)/\(basexcconfig)"), settings: baseSettings))
-        let formatted: [ResultObject] = results
-            .map { r in
-                (
-                    r.path, r.path.components.last == basexcconfig ?
-                        format(r.settings) :
-                        format(r.settings, with: [basexcconfig])
-                )
+        // Write Base.xcconfig
+        let basexcconfig = Path("\(dirPath.string)/Base.xcconfig")
+        try write(to: basexcconfig, settings: baseSettings)
+
+        // Trim Duplicates in same configurationNames
+        for configurationName in configurationNames {
+            let filtered = (baseResults + targetResults)
+                .filter { $0.path.components.last!.contains(configurationName) }
+            let common = filtered.map { $0.settings }.reduce([], trimDuplicates)
+            for result in filtered {
+                let settings = result.settings - common
+                try write(to: result.path, settings: settings, with: ["\(configurationName).xcconfig"])
             }
-            .map(ResultObject.init)
-        for r in formatted {
-            let data = (r.settings.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
-            try r.path.write(data)
         }
     } else {
-        let formatted: [ResultObject] = results
+        let formatted: [ResultObject] = (baseResults + targetResults)
             .map { r in ( r.path, format(r.settings)) }
             .map(ResultObject.init)
         for r in formatted {
