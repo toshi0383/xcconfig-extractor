@@ -10,7 +10,7 @@ import Foundation
 import Commander
 import PathKit
 
-let version = "1.0.0"
+let version = "0.2.0"
 let header = ["// Generated using xcconfig-extractor \(version) by Toshihiro Suzuki - https://github.com/toshi0383/xcconfig-extractor"]
 
 class ResultObject {
