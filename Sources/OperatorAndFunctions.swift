@@ -40,7 +40,7 @@ func compare(_ l: Any, _ r: Any) -> Bool {
     }
 }
 
-func trimDuplicates(acc: [String], values: [String]) -> [String] {
+func filterCommon(acc: [String], values: [String]) -> [String] {
     if acc.isEmpty {
         return values
     } else {
@@ -77,7 +77,7 @@ func format(_ result: [String], with includes: [String] = []) -> [String] {
     return header + includes.map {"#include \"\($0)\""} + result + ["\n"]
 }
 
-func write(to path: Path, settings: [String], with includes: [String] = []) throws {
+func write(to path: Path, settings: [String], includes: [String] = []) throws {
     let formatted = format(settings, with: includes)
     let data = (formatted.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
     try path.write(data)

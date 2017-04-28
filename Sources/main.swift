@@ -69,7 +69,7 @@ let main = command(
     // Base.xcconfig
     if isTrimDuplicates {
         let allResults = baseResults + targetResults
-        let baseSettings: [String] = allResults.map { $0.settings }.reduce([], trimDuplicates)
+        let baseSettings: [String] = allResults.map { $0.settings }.reduce([], filterCommon)
 
         // Trim lines from each resultss
         for i in (0..<baseResults.count) {
@@ -88,12 +88,12 @@ let main = command(
         for configurationName in configurationNames {
             let filtered = (baseResults + targetResults)
                 .filter { $0.path.components.last!.contains(configurationName) }
-            let common = filtered.map { $0.settings }.reduce([], trimDuplicates)
-            try write(to: Path("\(dirPath)/\(configurationName)-Base.xcconfig"), settings: common, with: ["Base.xcconfig"])
+            let common = filtered.map { $0.settings }.reduce([], filterCommon)
+            try write(to: Path("\(dirPath)/\(configurationName)-Base.xcconfig"), settings: common, includes: ["Base.xcconfig"])
             for result in filtered {
                 let settings = result.settings - common
                 if result.path.components.last == "\(configurationName).xcconfig" {
-                    try write(to: result.path, settings: settings, with: ["\(configurationName)-Base.xcconfig"])
+                    try write(to: result.path, settings: settings, includes: ["\(configurationName)-Base.xcconfig"])
                 } else {
                     try write(to: result.path, settings: settings)
                 }
