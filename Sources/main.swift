@@ -33,13 +33,17 @@ let main = command(
         try! dirPath.mkdir()
     }
 
+    //
     // read
+    //
     let data: Data = try path.read()
     guard let pbxproj = Pbxproj(data: data) else {
         fatalError("Failed to parse Pbxproj")
     }
 
+    //
     // write
+    //
     var baseResults = [ResultObject]()
     var targetResults = [ResultObject]()
 
@@ -98,12 +102,8 @@ let main = command(
         let basexcconfig = Path("\(dirPath.string)/Base.xcconfig")
         try write(to: basexcconfig, settings: commonBetweenConfigurationBases)
     } else {
-        let formatted: [ResultObject] = (baseResults + targetResults)
-            .map { r in ( r.path, format(r.settings)) }
-            .map(ResultObject.init)
-        for r in formatted {
-            let data = (r.settings.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
-            try r.path.write(data)
+        for r in (baseResults + targetResults) {
+            try write(to: r.path, settings: r.settings)
         }
     }
 }
