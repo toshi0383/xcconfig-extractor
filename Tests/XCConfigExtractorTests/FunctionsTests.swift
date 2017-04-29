@@ -4,6 +4,9 @@ func commonElements<T: Hashable>(_ args: [T]...) -> [T] {
     return commonElements(args)
 }
 func commonElements<T: Hashable>(_ args: [[T]]) -> [T] {
+    if args.isEmpty {
+        return []
+    }
     var fst: [T] = args[0]
     for i in (0..<fst.count).reversed() {
         for cur in args.dropFirst() {
@@ -44,6 +47,12 @@ class FunctionsTests: XCTestCase {
                 (3...4).map {$0}
             ),
             [4]
+        )
+        XCTAssertEqual(
+            commonElements(
+                [[Int]]()
+            ),
+            []
         )
     }
 }
