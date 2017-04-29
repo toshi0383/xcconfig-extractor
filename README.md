@@ -15,7 +15,7 @@ This will create xcconfig files under `Configuration` dir. Configurations are re
 # Available Options
 ```
 Options:
-    --trim-duplicates [default: true] - Extract duplicated lines to common xcconfig files.
+    --no-trim-duplicates [default: false] - Don't extract duplicated lines to common xcconfig files, simply map each buildSettings to one file.
     --no-edit-pbxproj [default: false] - Do not modify pbxproj.
 ```
 

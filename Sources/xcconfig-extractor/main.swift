@@ -45,9 +45,9 @@ func ==(lhs: ResultObject, rhs: ResultObject) -> Bool {
 let main = command(
     Argument<Path>("PATH", description: "xcodeproj file", validator: dirExists),
     Argument<Path>("DIR", description: "Output directory of xcconfig files. Mkdirs if missing. Files are overwritten."),
-    Flag("trim-duplicates", description: "Extract duplicated lines to common xcconfig files.", default: true),
+    Flag("no-trim-duplicates", description: "Don't extract duplicated lines to common xcconfig files, simply map each buildSettings to one file.", default: false),
     Flag("no-edit-pbxproj", description: "Do not modify pbxproj.", default: false)
-) { xcodeprojPath, dirPath, isTrimDuplicates, isNoEdit in
+) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit in
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
     if dirPath.isDirectory == false {
@@ -91,7 +91,11 @@ let main = command(
     }
 
     // Base.xcconfig
-    if isTrimDuplicates {
+    if isNoTrimDuplicates {
+        for r in (baseResults + targetResults) {
+            try write(to: r.path, settings: r.settings)
+        }
+    } else {
         // Trim Duplicates in same configurationNames
         for configurationName in configurationNames {
             let filtered = targetResults
@@ -116,10 +120,6 @@ let main = command(
         // Finally Write Base.xcconfig
         let basexcconfig = Path("\(dirPath.string)/Base.xcconfig")
         try write(to: basexcconfig, settings: commonBetweenConfigurationBases)
-    } else {
-        for r in (baseResults + targetResults) {
-            try write(to: r.path, settings: r.settings)
-        }
     }
 
     // Remove buildSettings from pbxproj

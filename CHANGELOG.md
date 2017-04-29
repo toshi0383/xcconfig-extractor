@@ -1,5 +1,9 @@
 ## master
 
+* Rename `trim-duplicates` to `--no-trim-duplicates`  
+  [Toshihiro Suzuki](https://github.com/toshi0383)
+  [#4](https://github.com/toshi0383/xcconfig-extractor/pull/4)
+
 * Fixed a lot of bugs before and after porting!🔥  
   [Toshihiro Suzuki](https://github.com/toshi0383)
   [#3](https://github.com/toshi0383/xcconfig-extractor/pull/3)
