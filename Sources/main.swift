@@ -24,9 +24,10 @@ class ResultObject {
 
 let main = command(
     Argument<Path>("PATH", description: "xcodeproj file", validator: dirExists),
-    Argument<Path>("DIR", description: "output directory"),
-    Flag("trim-duplicates", description: "extract duplicated lines to common xcconfigs.", default: true)
-) { xcodeprojPath, dirPath, isTrimDuplicates in
+    Argument<Path>("DIR", description: "Output directory of xcconfig files. Mkdirs if missing. Files are overwritten."),
+    Flag("trim-duplicates", description: "Extract duplicated lines to common xcconfig files.", default: true),
+    Flag("no-edit-pbxproj", description: "Do not modify pbxproj.", default: false)
+) { xcodeprojPath, dirPath, isTrimDuplicates, isNoEdit in
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
     if dirPath.isDirectory == false {
@@ -108,6 +109,9 @@ let main = command(
     }
 
     // Remove buildSettings from pbxproj
+    guard isNoEdit == false else {
+        return
+    }
 
     let contents: String = try pbxprojPath.read()
 
