@@ -81,7 +81,7 @@ let main = command(
                     $0.path.components.last!.contains(configurationName) &&
                         $0.path.components.last != "\(configurationName).xcconfig"
                 }
-            let commonFromUpperLayer: [String] = filtered.map { $0.settings }.filterCommon()
+            let commonFromUpperLayer: [String] = commonElements(filtered.map { $0.settings })
             // Write Upper Layer Configs (e.g. App-Debug.xcconfig, AppTests-Debug.xcconfig)
             for result in filtered {
                 let settings = result.settings - commonFromUpperLayer
@@ -93,7 +93,7 @@ let main = command(
             }.first!)
         }
         // Trim Duplicates in configurationName configs (e.g. Debug.xcconfig and Release.xcconfig)
-        let commonBetweenConfigurationBases = configurationNameResults.map { $0.settings } .filterCommon()
+        let commonBetweenConfigurationBases = commonElements(configurationNameResults.map { $0.settings })
         // Write Configuration Base Configs (e.g. Debug.xcconfig, Release.xcconfig)
         for result in configurationNameResults {
             let settings = result.settings - commonBetweenConfigurationBases

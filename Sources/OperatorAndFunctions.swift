@@ -66,29 +66,23 @@ func write(to path: Path, settings: [String], includes: [String] = []) throws {
     try path.write(data)
 }
 
-extension Array where Element == [String] {
-    func filterCommon() -> [String] {
-        func _filterCommon(acc: [String]?, values: [String]) -> [String]? {
-            if acc == nil {
-                return values
-            } else {
-                var r = acc!
-                for i in (0..<r.count).reversed() {
-                    let v = r[i]
-                    if values.contains(v) {
-                        continue
-                    } else {
-                        r.remove(at: i)
-                    }
+func commonElements<T: Hashable>(_ args: [T]...) -> [T] {
+    return commonElements(args)
+}
+func commonElements<T: Hashable>(_ args: [[T]]) -> [T] {
+    var results: [T] = []
+    for i in (1..<args.count) {
+        let fst = args[i-1]
+        let snd = args[i]
+        for l in fst {
+            for r in snd {
+                if l == r, !results.contains(l) {
+                    results.append(l)
                 }
-                return r
             }
         }
-        if self.isEmpty {
-            return []
-        }
-        return reduce(Optional<[String]>.none, _filterCommon)!
     }
+    return results
 }
 
 // MARK: Operators
