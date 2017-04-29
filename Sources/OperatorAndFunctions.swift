@@ -70,19 +70,19 @@ func commonElements<T: Hashable>(_ args: [T]...) -> [T] {
     return commonElements(args)
 }
 func commonElements<T: Hashable>(_ args: [[T]]) -> [T] {
-    var results: [T] = []
-    for i in (1..<args.count) {
-        let fst = args[i-1]
-        let snd = args[i]
-        for l in fst {
-            for r in snd {
-                if l == r, !results.contains(l) {
-                    results.append(l)
-                }
+    var fst: [T] = args[0]
+    for i in (0..<fst.count).reversed() {
+        for cur in args.dropFirst() {
+            if fst.isEmpty {
+                return fst
+            }
+            if cur.contains(fst[i]) == false {
+                fst.remove(at: i)
+                break // this breaks only inner loop
             }
         }
     }
-    return results
+    return fst
 }
 
 // MARK: Operators
