@@ -8,29 +8,31 @@
 
 import Foundation
 
-enum ProductType: String {
+public enum ProductType: String {
     case application = "com.apple.product-type.application"
     case unitTest = "com.apple.product-type.bundle.unit-test"
     case framework = "com.apple.product-type.framework"
+    case uiTesting = "com.apple.product-type.bundle.ui-testing"
+    case tool = "com.apple.product-type.tool"
 }
 
-struct NativeTarget: IsaObject {
-    let object: [String: Any]
+public struct NativeTarget: IsaObject {
+    public let object: [String: Any]
 
-    let name: String
-    let productName: String
-    let productType: ProductType
-    let buildRules: [Any] // TODO
-    let productReference: String
-    let dependencies: [Any] // TODO
-    let buildPhases: [String] // TODO
-    let buildConfigurationList: BuildConfigurationList
+    public let name: String
+    public let productName: String
+    public let productType: ProductType
+    public let buildRules: [Any]? // TODO
+    public let productReference: String
+    public let dependencies: [Any] // TODO
+    public let buildPhases: [String] // TODO
+    public let buildConfigurationList: BuildConfigurationList
     init(target o: [String: Any], objects: [String: Any]) {
         self.object = o
         self.name = o["name"] as! String
         self.productName = o["productName"] as! String
         self.productType = ProductType(rawValue: o["productType"] as! String)!
-        self.buildRules = o["buildRules"] as! [Any]
+        self.buildRules = o["buildRules"] as? [Any]
         self.productReference = o["productReference"] as! String
         self.dependencies = o["dependencies"] as! [Any]
         self.buildPhases = o["buildPhases"] as! [String]

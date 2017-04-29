@@ -9,17 +9,37 @@
 import Foundation
 import Commander
 import PathKit
+import PBXProj
+import Utilities
 
 let version = "0.2.0"
 let header = ["// Generated using xcconfig-extractor \(version) by Toshihiro Suzuki - https://github.com/toshi0383/xcconfig-extractor"]
 
-class ResultObject {
+func write(to path: Path, settings: [String], includes: [String] = []) throws {
+    let formatted = format(settings, with: includes)
+    let data = (formatted.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
+    try path.write(data)
+}
+
+func format(_ result: [String], with includes: [String] = []) -> [String] {
+    return header + includes.map {"#include \"\($0)\""} + result + ["\n"]
+}
+
+class ResultObject: Equatable {
     let path: Path
     var settings: [String]
-    init(path: Path, settings: [String]) {
+    let configurationName: String
+    init(path: Path, settings: [String], configurationName: String) {
         self.path = path
         self.settings = settings
+        self.configurationName = configurationName
     }
+}
+func ==(lhs: ResultObject, rhs: ResultObject) -> Bool {
+    guard lhs.path == rhs.path else { return false }
+    guard lhs.settings == rhs.settings else { return false }
+    guard lhs.configurationName == rhs.configurationName else { return false }
+    return true
 }
 
 let main = command(
@@ -31,7 +51,7 @@ let main = command(
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
     if dirPath.isDirectory == false {
-        try! dirPath.mkdir()
+        try! dirPath.mkpath()
     }
 
     //
@@ -53,13 +73,11 @@ let main = command(
         let filePath = Path("\(dirPath.string)/\(configuration.name).xcconfig")
         let buildSettings = configuration.buildSettings
         let lines = convertToLines(buildSettings)
-        baseResults.append(ResultObject(path: filePath, settings: lines))
+        baseResults.append(ResultObject(path: filePath, settings: lines, configurationName: configuration.name))
     }
 
     // targets
-    let configurations = pbxproj.rootObject.targets.flatMap { t in
-        t.buildConfigurationList.buildConfigurations
-    }
+    let configurations = pbxproj.rootObject.buildConfigurationList.buildConfigurations
     let configurationNames = Set(configurations.map { c in c.name })
     for target in pbxproj.rootObject.targets {
         let targetName = target.name
@@ -67,35 +85,31 @@ let main = command(
             let filePath = Path("\(dirPath.string)/\(targetName)-\(configuration.name).xcconfig")
             let buildSettings = configuration.buildSettings
             let lines = convertToLines(buildSettings)
-            targetResults.append(ResultObject(path: filePath, settings: lines))
+
+            targetResults.append(ResultObject(path: filePath, settings: lines, configurationName: configuration.name))
         }
     }
 
     // Base.xcconfig
     if isTrimDuplicates {
-        var configurationNameResults = [ResultObject]()
         // Trim Duplicates in same configurationNames
         for configurationName in configurationNames {
-            let filtered = (baseResults + targetResults)
-                .filter {
-                    $0.path.components.last!.contains(configurationName) &&
-                        $0.path.components.last != "\(configurationName).xcconfig"
-                }
-            let commonFromUpperLayer: [String] = filtered.map { $0.settings }.filterCommon()
+            let filtered = targetResults
+                .filter { $0.path.components.last!.contains(configurationName) }
+            let common: [String] = commonElements(filtered.map { $0.settings })
+            let configurationBase = baseResults.filter { $0.configurationName == configurationName }[0]
+            let idx = baseResults.index(of: configurationBase)!
+            baseResults[idx].settings = distinctArray(common + baseResults[idx].settings)
             // Write Upper Layer Configs (e.g. App-Debug.xcconfig, AppTests-Debug.xcconfig)
             for result in filtered {
-                let settings = result.settings - commonFromUpperLayer
-                try write(to: result.path, settings: settings)
+                let settings = result.settings - common
+                try write(to: result.path, settings: settings) // not including any other xcconfigs for targets'
             }
-
-            configurationNameResults.append(baseResults.filter {
-                $0.path.components.last == "\(configurationName).xcconfig"
-            }.first!)
         }
         // Trim Duplicates in configurationName configs (e.g. Debug.xcconfig and Release.xcconfig)
-        let commonBetweenConfigurationBases = configurationNameResults.map { $0.settings } .filterCommon()
+        let commonBetweenConfigurationBases = commonElements(baseResults.map { $0.settings })
         // Write Configuration Base Configs (e.g. Debug.xcconfig, Release.xcconfig)
-        for result in configurationNameResults {
+        for result in baseResults {
             let settings = result.settings - commonBetweenConfigurationBases
             try write(to: result.path, settings: settings, includes: ["Base.xcconfig"])
         }
@@ -109,7 +123,7 @@ let main = command(
     }
 
     // Remove buildSettings from pbxproj
-    guard isNoEdit == false else {
+    if isNoEdit {
         return
     }
 
@@ -118,7 +132,7 @@ let main = command(
     var result: [String] = []
     var skip = false
     let tabs = "\t\t\t"
-    let spaces = "           "
+    let spaces = "         "
     for line in contents.characters.split(separator: "\n", omittingEmptySubsequences: false) {
         let l = String(line)
         if l == "\(tabs)buildSettings = {" || l == "\(spaces)buildSettings = {" {

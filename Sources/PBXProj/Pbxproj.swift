@@ -9,14 +9,14 @@
 import Foundation
 import PathKit
 
-struct Pbxproj {
-    let archiveVersion: String
-    let classes: [String: Any]
-    let objectVersion: String
-    let rootObject: Project
-    let objects: [String: Any]
+public struct Pbxproj {
+    public let archiveVersion: String
+    public let classes: [String: Any]?
+    public let objectVersion: String
+    public let rootObject: Project
+    public let objects: [String: Any]
     fileprivate let raw: Any
-    init?(data: Data) {
+    public init?(data: Data) {
         var format = PropertyListSerialization.PropertyListFormat.xml
         guard let raw = try? PropertyListSerialization.propertyList(from: data, format: &format) else {
             return nil
@@ -29,7 +29,7 @@ struct Pbxproj {
         let values = raw as! [String: Any]
 
         self.archiveVersion = values["archiveVersion"] as! String
-        self.classes = values["classes"] as! [String: Any]
+        self.classes = values["classes"] as? [String: Any]
         self.objectVersion = values["objectVersion"] as! String
         guard let rootObjectKey = values["rootObject"] as? String,
             let objects = values["objects"] as? [String: Any]

@@ -1,14 +1,14 @@
 //
-//  Types.swift
+//  IsaObject.swift
 //  xcconfig-extractor
 //
-//  Created by Toshihiro Suzuki on 2017/04/27.
+//  Created by Toshihiro Suzuki on 2017/04/29.
 //  Copyright © 2017 Toshihiro Suzuki. All rights reserved.
 //
 
 import Foundation
 
-enum IsaType: String {
+public enum IsaType: String {
     case XCConfigurationList
     case XCBuildConfiguration
     case PBXSourcesBuildPhase
@@ -21,13 +21,13 @@ enum IsaType: String {
     case PBXBuildRule
 }
 
-protocol IsaObject {
+public protocol IsaObject {
     var isa: IsaType { get }
     var object: [String: Any] { get }
 }
 
 extension IsaObject {
-    var isa: IsaType {
+    public var isa: IsaType {
         return IsaType(rawValue: object["isa"] as! String)!
     }
 }

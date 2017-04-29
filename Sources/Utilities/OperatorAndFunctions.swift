@@ -9,7 +9,7 @@
 import Foundation
 import PathKit
 
-func compare(_ l: Any, _ r: Any) -> Bool {
+public func compare(_ l: Any, _ r: Any) -> Bool {
     switch l {
     case let ls as String:
         if let rs = r as? String {
@@ -40,7 +40,7 @@ func compare(_ l: Any, _ r: Any) -> Bool {
     }
 }
 
-func convertToLines(_ dictionary: [String: Any]) -> [String] {
+public func convertToLines(_ dictionary: [String: Any]) -> [String] {
     let result = dictionary.map { (k, v) -> String in
         switch v {
         case let s as String:
@@ -56,46 +56,46 @@ func convertToLines(_ dictionary: [String: Any]) -> [String] {
     return result
 }
 
-func format(_ result: [String], with includes: [String] = []) -> [String] {
-    return header + includes.map {"#include \"\($0)\""} + result + ["\n"]
+public func commonElements<T: Equatable>(_ args: [T]...) -> [T] {
+    return commonElements(args)
 }
-
-func write(to path: Path, settings: [String], includes: [String] = []) throws {
-    let formatted = format(settings, with: includes)
-    let data = (formatted.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
-    try path.write(data)
-}
-
-extension Array where Element == [String] {
-    func filterCommon() -> [String] {
-        func _filterCommon(acc: [String]?, values: [String]) -> [String]? {
-            if acc == nil {
-                return values
-            } else {
-                var r = acc!
-                for i in (0..<r.count).reversed() {
-                    let v = r[i]
-                    if values.contains(v) {
-                        continue
-                    } else {
-                        r.remove(at: i)
-                    }
-                }
-                return r
+public func commonElements<T: Equatable>(_ args: [[T]]) -> [T] {
+    if args.isEmpty {
+        return []
+    }
+    var fst: [T] = args[0]
+    for i in (0..<fst.count).reversed() {
+        for cur in args.dropFirst() {
+            if fst.isEmpty {
+                return fst
+            }
+            if cur.contains(fst[i]) == false {
+                fst.remove(at: i)
+                break // this breaks only inner loop
             }
         }
-        return reduce(Optional<[String]>.none, _filterCommon)!
     }
+    return fst
+}
+
+public func distinctArray<T: Equatable>(_ array: [T]) -> [T] {
+    var result: [T] = []
+    for e in array  {
+        if result.contains(e) == false {
+            result.append(e)
+        }
+    }
+    return result
 }
 
 // MARK: Operators
 infix operator +|
-func +|<T: Equatable>(l: [T], r: [T]) -> [T] {
+public func +|<T: Equatable>(l: [T], r: [T]) -> [T] {
     var o = l
     o.append(contentsOf: r)
     return o
 }
-func -<T: Equatable>(l: [T], r: [T]) -> [T] {
+public func -<T: Equatable>(l: [T], r: [T]) -> [T] {
     return l.filter { t in r.contains(t) == false }
 }
 
