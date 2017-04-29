@@ -84,6 +84,9 @@ extension Array where Element == [String] {
                 return r
             }
         }
+        if self.isEmpty {
+            return []
+        }
         return reduce(Optional<[String]>.none, _filterCommon)!
     }
 }
