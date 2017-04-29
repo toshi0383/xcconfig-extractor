@@ -26,9 +26,9 @@ let main = command(
     Argument<Path>("PATH", description: "xcodeproj file", validator: dirExists),
     Argument<Path>("DIR", description: "output directory"),
     Flag("trim-duplicates", description: "extract duplicated lines to common xcconfigs.", default: true)
-) { pbxprojPath, dirPath, isTrimDuplicates in
+) { xcodeprojPath, dirPath, isTrimDuplicates in
 
-    let path = pbxprojPath + Path("project.pbxproj")
+    let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
     if dirPath.isDirectory == false {
         try! dirPath.mkdir()
     }
@@ -36,7 +36,7 @@ let main = command(
     //
     // read
     //
-    let data: Data = try path.read()
+    let data: Data = try pbxprojPath.read()
     guard let pbxproj = Pbxproj(data: data) else {
         fatalError("Failed to parse Pbxproj")
     }
@@ -106,6 +106,28 @@ let main = command(
             try write(to: r.path, settings: r.settings)
         }
     }
+
+    // Remove buildSettings from pbxproj
+
+    let contents: String = try pbxprojPath.read()
+
+    var result: [String] = []
+    var skip = false
+    let tabs = "\t\t\t"
+    let spaces = "           "
+    for line in contents.characters.split(separator: "\n", omittingEmptySubsequences: false) {
+        let l = String(line)
+        if l == "\(tabs)buildSettings = {" || l == "\(spaces)buildSettings = {" {
+            result.append(l)
+            skip = true
+        } else if skip == true && (l == "\(tabs)};" || l == "\(spaces)};") {
+            result.append(l)
+            skip = false
+        } else if skip == false {
+            result.append(l)
+        }
+    }
+    try pbxprojPath.write(result.joined(separator: "\n"))
 }
 
 main.run(version)
