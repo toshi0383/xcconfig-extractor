@@ -11,11 +11,11 @@ import Foundation
 struct BuildConfigurationList: IsaObject {
     let object: [String: Any]
     let buildConfigurations: [BuildConfiguration]
-    let defaultConfigurationName: String
+    let defaultConfigurationName: String?
     let defaultConfigurationIsVisible: String
     init(_ o: [String: Any], objects: [String: Any]) {
         self.object = o
-        self.defaultConfigurationName = o["defaultConfigurationName"] as! String
+        self.defaultConfigurationName = o["defaultConfigurationName"] as? String
         let buildConfigurationKeys = o["buildConfigurations"] as! [String]
         self.buildConfigurations = buildConfigurationKeys.map { key in objects[key] as! [String: Any] }
             .map(BuildConfiguration.init)

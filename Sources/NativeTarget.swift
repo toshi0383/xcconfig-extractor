@@ -12,6 +12,7 @@ enum ProductType: String {
     case application = "com.apple.product-type.application"
     case unitTest = "com.apple.product-type.bundle.unit-test"
     case framework = "com.apple.product-type.framework"
+    case uiTesting = "com.apple.product-type.bundle.ui-testing"
 }
 
 struct NativeTarget: IsaObject {
