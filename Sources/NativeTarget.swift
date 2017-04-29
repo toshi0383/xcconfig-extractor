@@ -21,7 +21,7 @@ struct NativeTarget: IsaObject {
     let name: String
     let productName: String
     let productType: ProductType
-    let buildRules: [Any] // TODO
+    let buildRules: [Any]? // TODO
     let productReference: String
     let dependencies: [Any] // TODO
     let buildPhases: [String] // TODO
@@ -31,7 +31,7 @@ struct NativeTarget: IsaObject {
         self.name = o["name"] as! String
         self.productName = o["productName"] as! String
         self.productType = ProductType(rawValue: o["productType"] as! String)!
-        self.buildRules = o["buildRules"] as! [Any]
+        self.buildRules = o["buildRules"] as? [Any]
         self.productReference = o["productReference"] as! String
         self.dependencies = o["dependencies"] as! [Any]
         self.buildPhases = o["buildPhases"] as! [String]

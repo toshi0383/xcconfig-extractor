@@ -11,7 +11,7 @@ import PathKit
 
 struct Pbxproj {
     let archiveVersion: String
-    let classes: [String: Any]
+    let classes: [String: Any]?
     let objectVersion: String
     let rootObject: Project
     let objects: [String: Any]
@@ -29,7 +29,7 @@ struct Pbxproj {
         let values = raw as! [String: Any]
 
         self.archiveVersion = values["archiveVersion"] as! String
-        self.classes = values["classes"] as! [String: Any]
+        self.classes = values["classes"] as? [String: Any]
         self.objectVersion = values["objectVersion"] as! String
         guard let rootObjectKey = values["rootObject"] as? String,
             let objects = values["objects"] as? [String: Any]

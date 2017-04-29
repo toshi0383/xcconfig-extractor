@@ -19,7 +19,7 @@ struct Project: IsaObject {
     let mainGroup: String // TODO
     let productRefGroup: String // TODO
     let projectDirPath: String
-    let projectRoot: String
+    let projectRoot: String?
     let targets: [NativeTarget]
     init(_ o: [String: Any], objects: [String: Any]) {
         self.object = o
@@ -33,7 +33,7 @@ struct Project: IsaObject {
         self.mainGroup = o["mainGroup"] as! String
         self.productRefGroup = o["productRefGroup"] as! String
         self.projectDirPath = o["projectDirPath"] as! String
-        self.projectRoot = o["projectRoot"] as! String
+        self.projectRoot = o["projectRoot"] as? String
         self.targets = (o["targets"] as! [String]).map { k in
             let target = objects[k] as! [String: Any]
             return NativeTarget(target: target, objects: objects)
