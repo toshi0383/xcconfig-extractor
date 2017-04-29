@@ -69,9 +69,7 @@ let main = command(
     }
 
     // targets
-    let configurations = pbxproj.rootObject.targets.flatMap { t in
-        t.buildConfigurationList.buildConfigurations
-    }
+    let configurations = pbxproj.rootObject.buildConfigurationList.buildConfigurations
     let configurationNames = Set(configurations.map { c in c.name })
     for target in pbxproj.rootObject.targets {
         let targetName = target.name
