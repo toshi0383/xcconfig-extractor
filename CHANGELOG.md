@@ -1,4 +1,4 @@
-## master
+## 0.2.0
 
 * Rename `trim-duplicates` to `--no-trim-duplicates`  
   [Toshihiro Suzuki](https://github.com/toshi0383)
