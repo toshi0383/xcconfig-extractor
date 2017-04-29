@@ -118,7 +118,7 @@ let main = command(
     var result: [String] = []
     var skip = false
     let tabs = "\t\t\t"
-    let spaces = "           "
+    let spaces = "         "
     for line in contents.characters.split(separator: "\n", omittingEmptySubsequences: false) {
         let l = String(line)
         if l == "\(tabs)buildSettings = {" || l == "\(spaces)buildSettings = {" {
