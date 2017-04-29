@@ -56,10 +56,10 @@ public func convertToLines(_ dictionary: [String: Any]) -> [String] {
     return result
 }
 
-public func commonElements<T: Hashable>(_ args: [T]...) -> [T] {
+public func commonElements<T: Equatable>(_ args: [T]...) -> [T] {
     return commonElements(args)
 }
-public func commonElements<T: Hashable>(_ args: [[T]]) -> [T] {
+public func commonElements<T: Equatable>(_ args: [[T]]) -> [T] {
     if args.isEmpty {
         return []
     }
@@ -76,6 +76,16 @@ public func commonElements<T: Hashable>(_ args: [[T]]) -> [T] {
         }
     }
     return fst
+}
+
+public func distinctArray<T: Equatable>(_ array: [T]) -> [T] {
+    var result: [T] = []
+    for e in array  {
+        if result.contains(e) == false {
+            result.append(e)
+        }
+    }
+    return result
 }
 
 // MARK: Operators
