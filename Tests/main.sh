@@ -35,6 +35,6 @@ done
 
 if [ $STATUS ];then
     echo TEST FAILED
-    echo $FAILURES
+    echo Failing Tests: $FAILURES
 fi
 exit $STATUS
