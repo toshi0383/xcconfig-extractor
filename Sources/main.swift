@@ -31,7 +31,7 @@ let main = command(
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
     if dirPath.isDirectory == false {
-        try! dirPath.mkdir()
+        try! dirPath.mkpath()
     }
 
     //
