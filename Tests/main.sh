@@ -16,20 +16,13 @@ do
     proj=${dir}/${proj}
     cd ${proj}/..
     tmpdir="${PWD}/tmp/xcconfig-extractor-configs"
-    before=$(xcodebuild -showBuildSettings)
     COMMAND="${XCCONFIG_EXTRACTOR} ${proj} ${tmpdir}"
-    $COMMAND
+    $COMMAND && ls -l ${tmpdir}
     if [ $? -ne 0 ];then
         echo Execution Failed: $COMMAND
         FAILURES="$FAILURES $proj"
         STATUS=1
         continue
-    fi
-    after=$(xcodebuild -showBuildSettings)
-    if [ "$before" != "$after" ];then
-        echo xcodebuild -showBuildSettings result did not match!
-        FAILURES="$FAILURES $proj"
-        STATUS=1
     fi
 done
 
