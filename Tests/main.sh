@@ -15,8 +15,9 @@ for proj in $(find Fixtures -name "*xcodeproj")
 do
     proj=${dir}/${proj}
     cd ${proj}/..
+    tmpdir="${PWD}/tmp/xcconfig-extractor-configs"
     before=$(xcodebuild -showBuildSettings)
-    COMMAND="${XCCONFIG_EXTRACTOR} ${proj} ${dir}/xcconfig-extractor-configs"
+    COMMAND="${XCCONFIG_EXTRACTOR} ${proj} ${tmpdir}"
     $COMMAND
     if [ $? -ne 0 ];then
         echo Execution Failed: $COMMAND
