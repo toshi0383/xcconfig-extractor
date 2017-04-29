@@ -1,5 +1,9 @@
 ## master
 
+* Fixed a lot of bugs before and after porting!🔥  
+  [Toshihiro Suzuki](https://github.com/toshi0383)
+  [#3](https://github.com/toshi0383/xcconfig-extractor/pull/3)
+
 * Port Swift  
   [Toshihiro Suzuki](https://github.com/toshi0383)
   [#1](https://github.com/toshi0383/xcconfig-extractor/pull/1)
