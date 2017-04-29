@@ -2,7 +2,7 @@
 //  Validators.swift
 //  xcconfig-extractor
 //
-//  Created by Toshihiro suzuki on 2017/04/27.
+//  Created by Toshihiro Suzuki on 2017/04/27.
 //  Copyright © 2017 Toshihiro Suzuki. All rights reserved.
 //
 
