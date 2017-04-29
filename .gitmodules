@@ -1,0 +1,3 @@
+[submodule "Fixtures"]
+	path = Fixtures
+	url = git@github.com:toshi0383/xcodeproj-fixtures.git
