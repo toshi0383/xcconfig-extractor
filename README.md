@@ -16,6 +16,7 @@ This will create xcconfig files under `Configuration` dir. Configurations are re
 ```
 Options:
     --trim-duplicates [default: true] - Extract duplicated lines to common xcconfig files.
+    --no-edit-pbxproj [default: false] - Do not modify pbxproj.
 ```
 
 # TODOs
