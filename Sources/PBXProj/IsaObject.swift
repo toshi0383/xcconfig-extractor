@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum IsaType: String {
+public enum IsaType: String {
     case XCConfigurationList
     case XCBuildConfiguration
     case PBXSourcesBuildPhase
@@ -21,13 +21,13 @@ enum IsaType: String {
     case PBXBuildRule
 }
 
-protocol IsaObject {
+public protocol IsaObject {
     var isa: IsaType { get }
     var object: [String: Any] { get }
 }
 
 extension IsaObject {
-    var isa: IsaType {
+    public var isa: IsaType {
         return IsaType(rawValue: object["isa"] as! String)!
     }
 }

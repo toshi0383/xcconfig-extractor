@@ -8,20 +8,20 @@
 
 import Foundation
 
-struct Project: IsaObject {
-    let object: [String: Any]
-    let attributes: [String: Any]
-    let buildConfigurationList: BuildConfigurationList
-    let compatibilityVersion: String
-    let developmentRegion: String
-    let hasScannedForEncodings: String
-    let knownRegions: [String]
-    let mainGroup: String // TODO
-    let productRefGroup: String // TODO
-    let projectDirPath: String
-    let projectRoot: String?
-    let targets: [NativeTarget]
-    init(_ o: [String: Any], objects: [String: Any]) {
+public struct Project: IsaObject {
+    public let object: [String: Any]
+    public let attributes: [String: Any]
+    public let buildConfigurationList: BuildConfigurationList
+    public let compatibilityVersion: String
+    public let developmentRegion: String
+    public let hasScannedForEncodings: String
+    public let knownRegions: [String]
+    public let mainGroup: String // TODO
+    public let productRefGroup: String // TODO
+    public let projectDirPath: String
+    public let projectRoot: String?
+    public let targets: [NativeTarget]
+    public init(_ o: [String: Any], objects: [String: Any]) {
         self.object = o
         self.attributes = o["attributes"] as! [String: Any]
         let buildConfigurationListKey = o["buildConfigurationList"] as! String

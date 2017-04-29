@@ -9,7 +9,7 @@
 import Foundation
 import PathKit
 
-func compare(_ l: Any, _ r: Any) -> Bool {
+public func compare(_ l: Any, _ r: Any) -> Bool {
     switch l {
     case let ls as String:
         if let rs = r as? String {
@@ -40,7 +40,7 @@ func compare(_ l: Any, _ r: Any) -> Bool {
     }
 }
 
-func convertToLines(_ dictionary: [String: Any]) -> [String] {
+public func convertToLines(_ dictionary: [String: Any]) -> [String] {
     let result = dictionary.map { (k, v) -> String in
         switch v {
         case let s as String:
@@ -56,20 +56,10 @@ func convertToLines(_ dictionary: [String: Any]) -> [String] {
     return result
 }
 
-func format(_ result: [String], with includes: [String] = []) -> [String] {
-    return header + includes.map {"#include \"\($0)\""} + result + ["\n"]
-}
-
-func write(to path: Path, settings: [String], includes: [String] = []) throws {
-    let formatted = format(settings, with: includes)
-    let data = (formatted.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
-    try path.write(data)
-}
-
-func commonElements<T: Hashable>(_ args: [T]...) -> [T] {
+public func commonElements<T: Hashable>(_ args: [T]...) -> [T] {
     return commonElements(args)
 }
-func commonElements<T: Hashable>(_ args: [[T]]) -> [T] {
+public func commonElements<T: Hashable>(_ args: [[T]]) -> [T] {
     if args.isEmpty {
         return []
     }
@@ -90,12 +80,12 @@ func commonElements<T: Hashable>(_ args: [[T]]) -> [T] {
 
 // MARK: Operators
 infix operator +|
-func +|<T: Equatable>(l: [T], r: [T]) -> [T] {
+public func +|<T: Equatable>(l: [T], r: [T]) -> [T] {
     var o = l
     o.append(contentsOf: r)
     return o
 }
-func -<T: Equatable>(l: [T], r: [T]) -> [T] {
+public func -<T: Equatable>(l: [T], r: [T]) -> [T] {
     return l.filter { t in r.contains(t) == false }
 }
 

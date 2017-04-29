@@ -9,9 +9,21 @@
 import Foundation
 import Commander
 import PathKit
+import PBXProj
+import Utilities
 
 let version = "0.2.0"
 let header = ["// Generated using xcconfig-extractor \(version) by Toshihiro Suzuki - https://github.com/toshi0383/xcconfig-extractor"]
+
+func write(to path: Path, settings: [String], includes: [String] = []) throws {
+    let formatted = format(settings, with: includes)
+    let data = (formatted.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
+    try path.write(data)
+}
+
+func format(_ result: [String], with includes: [String] = []) -> [String] {
+    return header + includes.map {"#include \"\($0)\""} + result + ["\n"]
+}
 
 class ResultObject {
     let path: Path
