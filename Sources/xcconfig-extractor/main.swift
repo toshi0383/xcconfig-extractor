@@ -119,7 +119,7 @@ let main = command(
     }
 
     // Remove buildSettings from pbxproj
-    guard isNoEdit == false else {
+    if isNoEdit {
         return
     }
 
