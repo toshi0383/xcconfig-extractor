@@ -19,16 +19,26 @@ public enum IsaType: String {
     case PBXGroup
     case PBXFrameworksBuildPhase
     case PBXBuildRule
+    case PBXBuildFile
+    case PBXFileReference
+    case PBXContainerItemProxy
+    case PBXVariantGroup
+    case PBXTargetDependency
+    case XCVersionGroup
+    init(object: [String: Any]) {
+        self.init(rawValue: object["isa"] as! String)!
+    }
 }
 
 public protocol IsaObject {
+    var key: String { get }
     var isa: IsaType { get }
-    var object: [String: Any] { get }
-    init(_ o: [String: Any], objects: [String: Any])
+    var rawObject: [String: Any] { get }
+    init?(key: String, value: [String: Any], objects: [String: Any])
 }
 
 extension IsaObject {
     public var isa: IsaType {
-        return IsaType(rawValue: object["isa"] as! String)!
+        return IsaType(rawValue: rawObject["isa"] as! String)!
     }
 }

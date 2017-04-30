@@ -13,15 +13,29 @@ public enum FileType: String {
 }
 
 public struct FileReference: IsaObject {
-    public let object: [String : Any]
+    public let key: String
+    public let rawObject: [String : Any]
     public let lastKnownFileType: FileType
     public let path: String
     public let sourceTree: String
-    public init(_ o: [String : Any], objects: [String : Any]) {
-        self.object = o
+
+    // custom property
+    public let fullPath: String
+
+    public init?(key: String, value o: [String : Any], objects: [String : Any]) {
+        guard IsaType(object: o) == .PBXFileReference else {
+            return nil
+        }
+        self.key = key
+        self.rawObject = o
         self.lastKnownFileType = FileType(rawValue: o["lastKnownFileType"] as! String)!
         self.path = o["path"] as! String
+        let fullPath = findPaths(to: key, objects: objects) + [self.path]
+        self.fullPath = fullPath.joined(separator: "/")
         self.sourceTree = o["sourceTree"] as! String
+        guard isa == .PBXFileReference else {
+            return nil
+        }
     }
     public init?(from id: Any?, objects: [String: Any]) {
         guard let key = id as? String else {
@@ -30,6 +44,6 @@ public struct FileReference: IsaObject {
         guard let o = objects[key] as? [String: Any] else {
             return nil
         }
-        self.init(o, objects: objects)
+        self.init(key: key, value: o, objects: objects)
     }
 }
