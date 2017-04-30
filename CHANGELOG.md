@@ -1,3 +1,8 @@
+## master
+* Introduce `--cocoapods` option  
+  [Toshihiro Suzuki](https://github.com/toshi0383)
+  [#7](https://github.com/toshi0383/xcconfig-extractor/pull/7)
+
 ## 0.2.0
 
 * Rename `trim-duplicates` to `--no-trim-duplicates`  
