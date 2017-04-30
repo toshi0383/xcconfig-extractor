@@ -24,7 +24,7 @@ Make sure you setup each configurations correctly on Xcode.
 Options:
     --no-trim-duplicates [default: false] - Don't extract duplicated lines to common xcconfig files, simply map each buildSettings to one file.
     --no-edit-pbxproj [default: false] - Do not modify pbxproj.
-    --cocoapods [default: false] - `#include` CocoaPods generated xcconfigs.
+    --include-existing [default: true] - `#include` already configured xcconfigs.
 ```
 
 # TODOs
