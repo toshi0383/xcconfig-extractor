@@ -35,9 +35,10 @@ let main = command(
     let projRoot = xcodeprojPath + ".."
     let formatter = ResultFormatter(config: config)
 
-    // validate
-    if (dirPath.components - projRoot.components).count == 0 {
-        throw XCConfigExtractorError("Invalid DIR parameter: \(dirPath.string)\n It must be descendant of xcodeproj's root dir: \(projRoot.string)")
+    // validate DIR
+    guard projRoot.contains(dirPath) else {
+        print("Invalid DIR parameter: \(dirPath.string)\nIt must be descendant of xcodeproj's root dir: \(projRoot.string)")
+        exit(1)
     }
 
     //
