@@ -32,7 +32,13 @@ let main = command(
 
     // config
     let config = Config(isIncludeExisting: isIncludeExisting)
+    let projRoot = xcodeprojPath + ".."
     let formatter = ResultFormatter(config: config)
+
+    // validate
+    if (dirPath.components - projRoot.components).count == 0 {
+        throw XCConfigExtractorError("Invalid DIR parameter: \(dirPath.string)\n It must be descendant of xcodeproj's root dir: \(projRoot.string)")
+    }
 
     //
     // read
@@ -56,7 +62,9 @@ let main = command(
         let r = ResultObject(path: filePath, settings: lines, configurationName: configuration.name)
         if config.isIncludeExisting {
             if let fileref = configuration.baseConfigurationReference {
-                r.includes = [fileref.fullPath]
+                let depth = (dirPath.components - projRoot.components).count
+                let prefix = (0..<depth).reduce("") { $0.0 + "../" }
+                r.includes = [prefix + fileref.fullPath]
             }
         }
         baseResults.append(r)
@@ -75,7 +83,9 @@ let main = command(
             let r = ResultObject(path: filePath, settings: lines, targetName: targetName, configurationName: configuration.name)
             if config.isIncludeExisting {
                 if let fileref = configuration.baseConfigurationReference {
-                    r.includes = [fileref.fullPath]
+                    let depth = (projRoot.components - dirPath.components).count
+                    let prefix = (0..<depth).reduce("") {$0.0 == "" ? "./" : $0.0 + "../"}
+                    r.includes = [prefix + fileref.fullPath]
                 }
             }
             targetResults.append(r)
