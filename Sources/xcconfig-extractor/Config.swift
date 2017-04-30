@@ -10,8 +10,8 @@ import Foundation
 
 struct Config {
     static let version = "0.2.0"
-    let isCocoaPods: Bool
-    init(isCocoaPods: Bool) {
-        self.isCocoaPods = isCocoaPods
+    let isIncludeExisting: Bool
+    init(isIncludeExisting: Bool) {
+        self.isIncludeExisting = isIncludeExisting
     }
 }

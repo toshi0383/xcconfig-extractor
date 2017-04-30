@@ -22,8 +22,8 @@ let main = command(
     Argument<Path>("DIR", description: "Output directory of xcconfig files. Mkdirs if missing. Files are overwritten."),
     Flag("no-trim-duplicates", description: "Don't extract duplicated lines to common xcconfig files, simply map each buildSettings to one file.", default: false),
     Flag("no-edit-pbxproj", description: "Do not modify pbxproj.", default: false),
-    Flag("cocoapods", description: "`#include` CocoaPods generated xcconfigs.", default: false)
-) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit, isCocoaPods in
+    Flag("include-existing", description: "`#include` already configured xcconfigs.", default: true)
+) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit, isIncludeExisting in
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
     if dirPath.isDirectory == false {
@@ -31,7 +31,7 @@ let main = command(
     }
 
     // config
-    let config = Config(isCocoaPods: isCocoaPods)
+    let config = Config(isIncludeExisting: isIncludeExisting)
     let formatter = ResultFormatter(config: config)
 
     //
@@ -53,7 +53,13 @@ let main = command(
         let filePath = Path("\(dirPath.string)/\(configuration.name).xcconfig")
         let buildSettings = configuration.buildSettings
         let lines = convertToLines(buildSettings)
-        baseResults.append(ResultObject(path: filePath, settings: lines, configurationName: configuration.name))
+        let r = ResultObject(path: filePath, settings: lines, configurationName: configuration.name)
+        if config.isIncludeExisting {
+            if let fileref = configuration.baseConfigurationReference {
+                r.includes = [fileref.fullPath]
+            }
+        }
+        baseResults.append(r)
     }
 
     // targets
@@ -66,7 +72,13 @@ let main = command(
             let buildSettings = configuration.buildSettings
             let lines = convertToLines(buildSettings)
 
-            targetResults.append(ResultObject(path: filePath, settings: lines, targetName: targetName, configurationName: configuration.name))
+            let r = ResultObject(path: filePath, settings: lines, targetName: targetName, configurationName: configuration.name)
+            if config.isIncludeExisting {
+                if let fileref = configuration.baseConfigurationReference {
+                    r.includes = [fileref.fullPath]
+                }
+            }
+            targetResults.append(r)
         }
     }
 
