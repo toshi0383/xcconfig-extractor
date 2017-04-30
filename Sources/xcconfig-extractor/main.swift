@@ -12,47 +12,27 @@ import PathKit
 import PBXProj
 import Utilities
 
-let version = "0.2.0"
-let header = ["// Generated using xcconfig-extractor \(version) by Toshihiro Suzuki - https://github.com/toshi0383/xcconfig-extractor"]
-
-func write(to path: Path, settings: [String], includes: [String] = []) throws {
-    let formatted = format(settings, with: includes)
-    let data = (formatted.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
+func write(to path: Path, lines: [String] = []) throws {
+    let data = (lines.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
     try path.write(data)
-}
-
-func format(_ result: [String], with includes: [String] = []) -> [String] {
-    return header + includes.map {"#include \"\($0)\""} + result + ["\n"]
-}
-
-class ResultObject: Equatable {
-    let path: Path
-    var settings: [String]
-    let configurationName: String
-    init(path: Path, settings: [String], configurationName: String) {
-        self.path = path
-        self.settings = settings
-        self.configurationName = configurationName
-    }
-}
-func ==(lhs: ResultObject, rhs: ResultObject) -> Bool {
-    guard lhs.path == rhs.path else { return false }
-    guard lhs.settings == rhs.settings else { return false }
-    guard lhs.configurationName == rhs.configurationName else { return false }
-    return true
 }
 
 let main = command(
     Argument<Path>("PATH", description: "xcodeproj file", validator: dirExists),
     Argument<Path>("DIR", description: "Output directory of xcconfig files. Mkdirs if missing. Files are overwritten."),
     Flag("no-trim-duplicates", description: "Don't extract duplicated lines to common xcconfig files, simply map each buildSettings to one file.", default: false),
-    Flag("no-edit-pbxproj", description: "Do not modify pbxproj.", default: false)
-) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit in
+    Flag("no-edit-pbxproj", description: "Do not modify pbxproj.", default: false),
+    Flag("cocoapods", description: "`#include` CocoaPods generated xcconfigs.", default: false)
+) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit, isCocoaPods in
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
     if dirPath.isDirectory == false {
         try! dirPath.mkpath()
     }
+
+    // config
+    let config = Config(isCocoaPods: isCocoaPods)
+    let formatter = ResultFormatter(config: config)
 
     //
     // read
@@ -86,14 +66,14 @@ let main = command(
             let buildSettings = configuration.buildSettings
             let lines = convertToLines(buildSettings)
 
-            targetResults.append(ResultObject(path: filePath, settings: lines, configurationName: configuration.name))
+            targetResults.append(ResultObject(path: filePath, settings: lines, targetName: targetName, configurationName: configuration.name))
         }
     }
 
     // Base.xcconfig
     if isNoTrimDuplicates {
         for r in (baseResults + targetResults) {
-            try write(to: r.path, settings: r.settings)
+            try write(to: r.path, lines: formatter.format(result: r))
         }
     } else {
         // Trim Duplicates in same configurationNames
@@ -105,21 +85,21 @@ let main = command(
             let idx = baseResults.index(of: configurationBase)!
             baseResults[idx].settings = distinctArray(common + baseResults[idx].settings)
             // Write Upper Layer Configs (e.g. App-Debug.xcconfig, AppTests-Debug.xcconfig)
-            for result in filtered {
-                let settings = result.settings - common
-                try write(to: result.path, settings: settings) // not including any other xcconfigs for targets'
+            for r in filtered {
+                r.settings = r.settings - common
+                try write(to: r.path, lines: formatter.format(result: r)) // not including any other xcconfigs for targets'
             }
         }
         // Trim Duplicates in configurationName configs (e.g. Debug.xcconfig and Release.xcconfig)
-        let commonBetweenConfigurationBases = commonElements(baseResults.map { $0.settings })
+        let common = commonElements(baseResults.map { $0.settings })
         // Write Configuration Base Configs (e.g. Debug.xcconfig, Release.xcconfig)
-        for result in baseResults {
-            let settings = result.settings - commonBetweenConfigurationBases
-            try write(to: result.path, settings: settings, includes: ["Base.xcconfig"])
+        for r in baseResults {
+            r.settings = r.settings - common
+            try write(to: r.path, lines: formatter.format(result: r, includes: ["Base.xcconfig"]))
         }
         // Finally Write Base.xcconfig
-        let basexcconfig = Path("\(dirPath.string)/Base.xcconfig")
-        try write(to: basexcconfig, settings: commonBetweenConfigurationBases)
+        let r = ResultObject(path: Path("\(dirPath.string)/Base.xcconfig"), settings: common)
+        try write(to: r.path, lines: formatter.format(result: r))
     }
 
     // Remove buildSettings from pbxproj
@@ -148,4 +128,4 @@ let main = command(
     try pbxprojPath.write(result.joined(separator: "\n"))
 }
 
-main.run(version)
+main.run(Config.version)
