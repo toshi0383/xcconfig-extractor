@@ -24,6 +24,7 @@ public enum IsaType: String {
 public protocol IsaObject {
     var isa: IsaType { get }
     var object: [String: Any] { get }
+    init(_ o: [String: Any], objects: [String: Any])
 }
 
 extension IsaObject {

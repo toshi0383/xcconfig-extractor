@@ -27,7 +27,7 @@ public struct NativeTarget: IsaObject {
     public let dependencies: [Any] // TODO
     public let buildPhases: [String] // TODO
     public let buildConfigurationList: BuildConfigurationList
-    init(target o: [String: Any], objects: [String: Any]) {
+    public init(_ o: [String: Any], objects: [String: Any]) {
         self.object = o
         self.name = o["name"] as! String
         self.productName = o["productName"] as! String

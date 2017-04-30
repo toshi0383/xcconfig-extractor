@@ -36,7 +36,7 @@ public struct Project: IsaObject {
         self.projectRoot = o["projectRoot"] as? String
         self.targets = (o["targets"] as! [String]).map { k in
             let target = objects[k] as! [String: Any]
-            return NativeTarget(target: target, objects: objects)
+            return NativeTarget(target, objects: objects)
         }
     }
 }
