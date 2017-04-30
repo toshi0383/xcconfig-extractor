@@ -27,8 +27,25 @@ Options:
     --include-existing [default: true] - `#include` already configured xcconfigs.
 ```
 
+# Build Setting Validation
+⚠️***Waring***⚠️
+
+You should check app's Build Settings hasn't been affected by applying this tool.
+xcconfig does not allow any `$(inherited)` from `#include`ing xcconfigs. (See: https://github.com/toshi0383/xcconfig-extractor/pull/8#issuecomment-298234943) So if you have any existing xcconfig configured on your project, it might cause problems.
+
+Recommended way to check Build Settings is to run command like below. Make sure outputs does not change between before and after.
+```bash
+$ xcodebuild -showBuildSettings -configuration Release > before
+$ # apply xcconfig-extractor
+$ xcodebuild -showBuildSettings -configuration Release > after
+$ diff before after # should prints nothing!
+```
+
+If output changed, you should manually fix it. (e.g. by adding missing variable to target's(top level) xcconfig.)  
+[This article](https://pewpewthespells.com/blog/xcconfig_guide.html#BuildSettingInheritance) is helpful to understand how inheritance works.
+
 # TODOs
-- Add Tests
+- Add More Tests
 
 # License
 MIT
