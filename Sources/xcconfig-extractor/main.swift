@@ -84,8 +84,8 @@ let main = command(
             let r = ResultObject(path: filePath, settings: lines, targetName: targetName, configurationName: configuration.name)
             if config.isIncludeExisting {
                 if let fileref = configuration.baseConfigurationReference {
-                    let depth = (projRoot.components - dirPath.components).count
-                    let prefix = (0..<depth).reduce("") {$0.0 == "" ? "./" : $0.0 + "../"}
+                    let depth = (dirPath.components - projRoot.components).count
+                    let prefix = (0..<depth).reduce("") { $0.0 + "../" }
                     r.includes = [prefix + fileref.fullPath]
                 }
             }

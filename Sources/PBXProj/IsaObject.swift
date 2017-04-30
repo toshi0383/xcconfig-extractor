@@ -24,6 +24,7 @@ public enum IsaType: String {
     case PBXContainerItemProxy
     case PBXVariantGroup
     case PBXTargetDependency
+    case PBXCopyFilesBuildPhase
     case XCVersionGroup
     init(object: [String: Any]) {
         self.init(rawValue: object["isa"] as! String)!
