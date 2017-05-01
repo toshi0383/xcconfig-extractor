@@ -28,7 +28,7 @@ let main = command(
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
     let projRoot = xcodeprojPath + ".."
     // validate DIR
-    guard dirPath.components.starts(with: projRoot.components) else {
+    guard dirPath.absolute().components.starts(with: projRoot.absolute().components) else {
         print("Invalid DIR parameter: \(dirPath.string)\nIt must be descendant of xcodeproj's root dir: \(projRoot.string)")
         exit(1)
     }
