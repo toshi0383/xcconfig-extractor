@@ -1,4 +1,4 @@
-## master
+## 0.3.1
 * Trim Targets' Duplicated Lines  
   [Toshihiro Suzuki](https://github.com/toshi0383)
   [#9](https://github.com/toshi0383/xcconfig-extractor/pull/9)
