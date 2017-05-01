@@ -26,6 +26,10 @@ let main = command(
 ) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit, isIncludeExisting in
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
+    guard pbxprojPath.isFile else {
+        print("pbxproj not exist!: \(pbxprojPath.string)")
+        exit(1)
+    }
     let projRoot = xcodeprojPath + ".."
     // validate DIR
     guard dirPath.absolute().components.starts(with: projRoot.absolute().components) else {
