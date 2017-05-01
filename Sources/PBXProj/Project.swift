@@ -9,7 +9,8 @@
 import Foundation
 
 public struct Project: IsaObject {
-    public let object: [String: Any]
+    public let key: String
+    public let rawObject: [String: Any]
     public let attributes: [String: Any]
     public let buildConfigurationList: BuildConfigurationList
     public let compatibilityVersion: String
@@ -21,11 +22,15 @@ public struct Project: IsaObject {
     public let projectDirPath: String
     public let projectRoot: String?
     public let targets: [NativeTarget]
-    public init(_ o: [String: Any], objects: [String: Any]) {
-        self.object = o
+    public init?(key: String, value o: [String: Any], objects: [String: Any]) {
+        guard IsaType(object: o) == .PBXProject else {
+            return nil
+        }
+        self.key = key
+        self.rawObject = o
         self.attributes = o["attributes"] as! [String: Any]
         let buildConfigurationListKey = o["buildConfigurationList"] as! String
-        self.buildConfigurationList = BuildConfigurationList(objects[buildConfigurationListKey] as! [String: Any], objects: objects)
+        self.buildConfigurationList = BuildConfigurationList(key: buildConfigurationListKey, objects: objects)!
         self.compatibilityVersion = o["compatibilityVersion"] as! String
         self.developmentRegion = o["developmentRegion"] as! String
         self.hasScannedForEncodings = o["hasScannedForEncodings"] as! String
@@ -35,8 +40,7 @@ public struct Project: IsaObject {
         self.projectDirPath = o["projectDirPath"] as! String
         self.projectRoot = o["projectRoot"] as? String
         self.targets = (o["targets"] as! [String]).map { k in
-            let target = objects[k] as! [String: Any]
-            return NativeTarget(target: target, objects: objects)
+            return NativeTarget(key: k, objects: objects)!
         }
     }
 }

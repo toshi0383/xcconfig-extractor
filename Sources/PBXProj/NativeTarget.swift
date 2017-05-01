@@ -17,7 +17,8 @@ public enum ProductType: String {
 }
 
 public struct NativeTarget: IsaObject {
-    public let object: [String: Any]
+    public let key: String
+    public let rawObject: [String: Any]
 
     public let name: String
     public let productName: String
@@ -27,8 +28,12 @@ public struct NativeTarget: IsaObject {
     public let dependencies: [Any] // TODO
     public let buildPhases: [String] // TODO
     public let buildConfigurationList: BuildConfigurationList
-    init(target o: [String: Any], objects: [String: Any]) {
-        self.object = o
+    public init?(key: String, value o: [String: Any], objects: [String: Any]) {
+        guard IsaType(object: o) == .PBXNativeTarget else {
+            return nil
+        }
+        self.key = key
+        self.rawObject = o
         self.name = o["name"] as! String
         self.productName = o["productName"] as! String
         self.productType = ProductType(rawValue: o["productType"] as! String)!
@@ -37,6 +42,6 @@ public struct NativeTarget: IsaObject {
         self.dependencies = o["dependencies"] as! [Any]
         self.buildPhases = o["buildPhases"] as! [String]
         let buildConfigurationListKey = o["buildConfigurationList"] as! String
-        self.buildConfigurationList = BuildConfigurationList(objects[buildConfigurationListKey] as! [String: Any], objects: objects)
+        self.buildConfigurationList = BuildConfigurationList(key: buildConfigurationListKey, objects: objects)!
     }
 }

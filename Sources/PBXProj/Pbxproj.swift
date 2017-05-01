@@ -37,7 +37,7 @@ public struct Pbxproj {
             fatalError("rootObject or objects not found!")
         }
         self.objects = objects
-        let rootObject = Project(objects[rootObjectKey] as! [String: Any], objects: objects)
+        let rootObject = Project(key: rootObjectKey, objects: objects)!
         self.rootObject = rootObject
     }
     func object<T>(for key: String) -> T {
