@@ -28,7 +28,7 @@ Options:
 ```
 
 # Build Setting Validation
-⚠️***Waring***⚠️
+⚠️ ***Waring*** ⚠️
 
 You should check app's Build Settings hasn't been affected by applying this tool.
 xcconfig does not allow any `$(inherited)` from `#include`ing xcconfigs. (See: https://github.com/toshi0383/xcconfig-extractor/pull/8#issuecomment-298234943) So if you have any existing xcconfig configured on your project, it might cause problems.
