@@ -140,7 +140,8 @@ let main = command(
     var skip = false
     let tabs = "\t\t\t"
     let spaces = "         "
-    for line in contents.characters.split(separator: "\n", omittingEmptySubsequences: false) {
+    let allLines = contents.characters.split(separator: "\n", omittingEmptySubsequences: false)
+    for line in allLines {
         let l = String(line)
         if l == "\(tabs)buildSettings = {" || l == "\(spaces)buildSettings = {" {
             result.append(l)
@@ -152,7 +153,9 @@ let main = command(
             result.append(l)
         }
     }
-    try pbxprojPath.write(result.joined(separator: "\n"))
+    if allLines.count != result.count {
+        try pbxprojPath.write(result.joined(separator: "\n"))
+    }
 }
 
 main.run(Config.version)
