@@ -27,21 +27,21 @@ let main = command(
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
     guard pbxprojPath.isFile else {
-        print("pbxproj not exist!: \(pbxprojPath.string)")
+        printStdError("pbxproj not exist!: \(pbxprojPath.string)")
         exit(1)
     }
     let projRoot = xcodeprojPath + ".."
     // validate DIR
     guard dirPath.absolute().components.starts(with: projRoot.absolute().components) else {
-        print("Invalid DIR parameter: \(dirPath.string)\nIt must be descendant of xcodeproj's root dir: \(projRoot.string)")
+        printStdError("Invalid DIR parameter: \(dirPath.string)\nIt must be descendant of xcodeproj's root dir: \(projRoot.string)")
         exit(1)
     }
 
-    if dirPath.exists == false {
-        if dirPath.isFile {
-            print("file already exists: \(dirPath.string)")
-            exit(1)
-        }
+    if dirPath.isFile {
+        printStdError("file already exists: \(dirPath.string)")
+        exit(1)
+    }
+    if dirPath.isDirectory == false {
         try! dirPath.mkpath()
     }
 
@@ -54,7 +54,8 @@ let main = command(
     //
     let data: Data = try pbxprojPath.read()
     guard let pbxproj = Pbxproj(data: data) else {
-        fatalError("Failed to parse Pbxproj")
+        printStdError("Failed to parse Pbxproj")
+        exit(1)
     }
 
     //
