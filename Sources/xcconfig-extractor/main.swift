@@ -118,10 +118,26 @@ let main = command(
             baseResults[idx].settings = distinctArray(common + baseResults[idx].settings)
             // Write Upper Layer Configs (e.g. App-Debug.xcconfig, AppTests-Debug.xcconfig)
             for r in filtered {
-                r.settings = r.settings - common
-                try write(to: r.path, lines: formatter.format(result: r)) // not including any other xcconfigs for targets'
+                let idx = targetResults.index(of: r)!
+                targetResults[idx].settings = r.settings - common
             }
         }
+        // Trim Duplicates in target configs (e.g. App-Debug.xcconfig and App-Release.xcconfig)
+        for target in pbxproj.rootObject.targets {
+            let filtered = targetResults
+                .filter { $0.path.components.last!.characters.starts(with: "\(target.name)-".characters) }
+            let common: [String] = commonElements(filtered.map { $0.settings })
+            let targetConfigPath = Path("\(dirPath.string)/\(target.name).xcconfig")
+            let r = ResultObject(path: targetConfigPath, settings: common)
+            try write(to: r.path, lines: formatter.format(result: r))
+            for r in filtered {
+                let idx = targetResults.index(of: r)!
+                targetResults[idx].settings = r.settings - common
+                targetResults[idx].includes += [targetConfigPath.lastComponent]
+                try write(to: r.path, lines: formatter.format(result: targetResults[idx]))
+            }
+        }
+
         // Trim Duplicates in configurationName configs (e.g. Debug.xcconfig and Release.xcconfig)
         let common = commonElements(baseResults.map { $0.settings })
         // Write Configuration Base Configs (e.g. Debug.xcconfig, Release.xcconfig)
