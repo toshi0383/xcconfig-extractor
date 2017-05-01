@@ -25,5 +25,6 @@ class ResultFormatter {
             + result.includes.map(addInclude)
             + includes.map(addInclude)
             + result.settings
+            + ["\n"]
     }
 }
