@@ -33,9 +33,6 @@ public struct FileReference: IsaObject {
         let fullPath = findPaths(to: key, objects: objects) + [self.path]
         self.fullPath = fullPath.joined(separator: "/")
         self.sourceTree = o["sourceTree"] as! String
-        guard isa == .PBXFileReference else {
-            return nil
-        }
     }
     public init?(from id: Any?, objects: [String: Any]) {
         guard let key = id as? String else {
