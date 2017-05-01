@@ -113,8 +113,7 @@ let main = command(
             let filtered = targetResults
                 .filter { $0.path.components.last!.contains("-\(configurationName).xcconfig") }
             let common: [String] = commonElements(filtered.map { $0.settings })
-            let configurationBase = baseResults.filter { $0.configurationName == configurationName }[0]
-            let idx = baseResults.index(of: configurationBase)!
+            let idx = baseResults.index { $0.configurationName == configurationName }!
             baseResults[idx].settings = distinctArray(common + baseResults[idx].settings)
             // Write Upper Layer Configs (e.g. App-Debug.xcconfig, AppTests-Debug.xcconfig)
             for r in filtered {
