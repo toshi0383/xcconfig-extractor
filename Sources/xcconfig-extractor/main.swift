@@ -26,20 +26,24 @@ let main = command(
 ) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit, isIncludeExisting in
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
-    if dirPath.isDirectory == false {
+    let projRoot = xcodeprojPath + ".."
+    // validate DIR
+    guard dirPath.components.starts(with: projRoot.components) else {
+        print("Invalid DIR parameter: \(dirPath.string)\nIt must be descendant of xcodeproj's root dir: \(projRoot.string)")
+        exit(1)
+    }
+
+    if dirPath.exists == false {
+        if dirPath.isFile {
+            print("file already exists: \(dirPath.string)")
+            exit(1)
+        }
         try! dirPath.mkpath()
     }
 
     // config
     let config = Config(isIncludeExisting: isIncludeExisting)
-    let projRoot = xcodeprojPath + ".."
     let formatter = ResultFormatter(config: config)
-
-    // validate DIR
-    guard projRoot.contains(dirPath) else {
-        print("Invalid DIR parameter: \(dirPath.string)\nIt must be descendant of xcodeproj's root dir: \(projRoot.string)")
-        exit(1)
-    }
 
     //
     // read
