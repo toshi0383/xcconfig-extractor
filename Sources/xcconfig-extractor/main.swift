@@ -111,7 +111,7 @@ let main = command(
         // Trim Duplicates in same configurationNames
         for configurationName in configurationNames {
             let filtered = targetResults
-                .filter { $0.path.components.last!.contains(configurationName) }
+                .filter { $0.path.components.last!.contains("-\(configurationName).xcconfig") }
             let common: [String] = commonElements(filtered.map { $0.settings })
             let configurationBase = baseResults.filter { $0.configurationName == configurationName }[0]
             let idx = baseResults.index(of: configurationBase)!
