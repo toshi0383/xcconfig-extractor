@@ -9,7 +9,7 @@
 import Foundation
 
 struct Config {
-    static let version = "0.2.0"
+    static let version = "0.3.0"
     let isIncludeExisting: Bool
     init(isIncludeExisting: Bool) {
         self.isIncludeExisting = isIncludeExisting

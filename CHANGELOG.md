@@ -1,4 +1,4 @@
-## master
+## 0.3.0
 * Introduce `--include-existing` (`--no-include-existing`) option  
   [Toshihiro Suzuki](https://github.com/toshi0383)
   [#8](https://github.com/toshi0383/xcconfig-extractor/pull/8)
