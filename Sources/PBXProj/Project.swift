@@ -30,7 +30,7 @@ public struct Project: IsaObject {
         self.rawObject = o
         self.attributes = o["attributes"] as! [String: Any]
         let buildConfigurationListKey = o["buildConfigurationList"] as! String
-        self.buildConfigurationList = BuildConfigurationList(key: buildConfigurationListKey, value: objects[buildConfigurationListKey] as! [String: Any], objects: objects)!
+        self.buildConfigurationList = BuildConfigurationList(key: buildConfigurationListKey, objects: objects)!
         self.compatibilityVersion = o["compatibilityVersion"] as! String
         self.developmentRegion = o["developmentRegion"] as! String
         self.hasScannedForEncodings = o["hasScannedForEncodings"] as! String
@@ -40,8 +40,7 @@ public struct Project: IsaObject {
         self.projectDirPath = o["projectDirPath"] as! String
         self.projectRoot = o["projectRoot"] as? String
         self.targets = (o["targets"] as! [String]).map { k in
-            let target = objects[k] as! [String: Any]
-            return NativeTarget(key: k, value: target, objects: objects)!
+            return NativeTarget(key: k, objects: objects)!
         }
     }
 }

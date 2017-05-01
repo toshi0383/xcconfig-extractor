@@ -42,6 +42,6 @@ public struct NativeTarget: IsaObject {
         self.dependencies = o["dependencies"] as! [Any]
         self.buildPhases = o["buildPhases"] as! [String]
         let buildConfigurationListKey = o["buildConfigurationList"] as! String
-        self.buildConfigurationList = BuildConfigurationList(key: buildConfigurationListKey, value: objects[buildConfigurationListKey] as! [String: Any], objects: objects)!
+        self.buildConfigurationList = BuildConfigurationList(key: buildConfigurationListKey, objects: objects)!
     }
 }

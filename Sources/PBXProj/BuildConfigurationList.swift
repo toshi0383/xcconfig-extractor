@@ -22,7 +22,7 @@ public struct BuildConfigurationList: IsaObject {
         self.rawObject = o
         self.defaultConfigurationName = o["defaultConfigurationName"] as? String
         let buildConfigurationKeys = o["buildConfigurations"] as! [String]
-        self.buildConfigurations = buildConfigurationKeys.map { key in (key, objects[key] as! [String: Any], objects) }
+        self.buildConfigurations = buildConfigurationKeys.map { key in (key, objects) }
             .flatMap(BuildConfiguration.init)
         self.defaultConfigurationIsVisible = o["defaultConfigurationIsVisible"] as! String
     }
@@ -41,7 +41,7 @@ public struct BuildConfiguration: IsaObject {
         self.key = key
         self.rawObject = o
         self.name = o["name"] as! String
-        self.baseConfigurationReference = FileReference(from: o["baseConfigurationReference"], objects: objects)
+        self.baseConfigurationReference = FileReference(key: o["baseConfigurationReference"], objects: objects)
         self.buildSettings = o["buildSettings"] as! [String: Any]
     }
 }

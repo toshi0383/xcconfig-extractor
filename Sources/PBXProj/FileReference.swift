@@ -34,13 +34,4 @@ public struct FileReference: IsaObject {
         self.fullPath = fullPath.joined(separator: "/")
         self.sourceTree = o["sourceTree"] as! String
     }
-    public init?(from id: Any?, objects: [String: Any]) {
-        guard let key = id as? String else {
-            return nil
-        }
-        guard let o = objects[key] as? [String: Any] else {
-            return nil
-        }
-        self.init(key: key, value: o, objects: objects)
-    }
 }

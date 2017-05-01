@@ -36,10 +36,20 @@ public protocol IsaObject {
     var isa: IsaType { get }
     var rawObject: [String: Any] { get }
     init?(key: String, value: [String: Any], objects: [String: Any])
+    init?(key: Any?, objects: [String: Any])
 }
 
 extension IsaObject {
     public var isa: IsaType {
         return IsaType(rawValue: rawObject["isa"] as! String)!
+    }
+    public init?(key: Any?, objects: [String: Any]) {
+        guard let key = key as? String else {
+            return nil
+        }
+        guard let o = objects[key] as? [String: Any] else {
+            return nil
+        }
+        self.init(key: key, value: o, objects: objects)
     }
 }
