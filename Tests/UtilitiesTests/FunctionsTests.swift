@@ -1,26 +1,5 @@
 import XCTest
-
-func commonElements<T: Hashable>(_ args: [T]...) -> [T] {
-    return commonElements(args)
-}
-func commonElements<T: Hashable>(_ args: [[T]]) -> [T] {
-    if args.isEmpty {
-        return []
-    }
-    var fst: [T] = args[0]
-    for i in (0..<fst.count).reversed() {
-        for cur in args.dropFirst() {
-            if fst.isEmpty {
-                return fst
-            }
-            if cur.contains(fst[i]) == false {
-                fst.remove(at: i)
-                break // this breaks only inner loop
-            }
-        }
-    }
-    return fst
-}
+@testable import Utilities
 
 class FunctionsTests: XCTestCase {
     func testCommonElements() {
