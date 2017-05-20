@@ -9,7 +9,7 @@
 import Foundation
 import Commander
 import PathKit
-import PBXProj
+import Pbxproj
 import Utilities
 
 func write(to path: Path, lines: [String] = []) throws {
@@ -52,8 +52,7 @@ let main = command(
     //
     // read
     //
-    let data: Data = try pbxprojPath.read()
-    guard let pbxproj = Pbxproj(data: data) else {
+    guard let pbxproj = try? Pbxproj(path: pbxprojPath.string) else {
         printStdError("Failed to parse Pbxproj")
         exit(1)
     }
@@ -67,7 +66,7 @@ let main = command(
     // base
     for configuration in pbxproj.rootObject.buildConfigurationList.buildConfigurations {
         let filePath = Path("\(dirPath.string)/\(configuration.name).xcconfig")
-        let buildSettings = configuration.buildSettings
+        let buildSettings = configuration.buildSettings.dictionary
         let lines = convertToLines(buildSettings)
         let r = ResultObject(path: filePath, settings: lines, configurationName: configuration.name)
         if config.isIncludeExisting {
@@ -83,11 +82,11 @@ let main = command(
     // targets
     let configurations = pbxproj.rootObject.buildConfigurationList.buildConfigurations
     let configurationNames = Set(configurations.map { c in c.name })
-    for target in pbxproj.rootObject.targets {
+    for target in pbxproj.targets {
         let targetName = target.name
         for configuration in target.buildConfigurationList.buildConfigurations {
             let filePath = Path("\(dirPath.string)/\(targetName)-\(configuration.name).xcconfig")
-            let buildSettings = configuration.buildSettings
+            let buildSettings = configuration.buildSettings.dictionary
             let lines = convertToLines(buildSettings)
 
             let r = ResultObject(path: filePath, settings: lines, targetName: targetName, configurationName: configuration.name)
@@ -122,7 +121,7 @@ let main = command(
             }
         }
         // Trim Duplicates in target configs (e.g. App-Debug.xcconfig and App-Release.xcconfig)
-        for target in pbxproj.rootObject.targets {
+        for target in pbxproj.targets {
             let filtered = targetResults
                 .filter { $0.path.components.last!.characters.starts(with: "\(target.name)-".characters) }
             let common: [String] = commonElements(filtered.map { $0.settings })

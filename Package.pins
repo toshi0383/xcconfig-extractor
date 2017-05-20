@@ -2,6 +2,12 @@
   "autoPin": true,
   "pins": [
     {
+      "package": "AsciiPlistParser",
+      "reason": null,
+      "repositoryURL": "https://github.com/toshi0383/AsciiPlistParser.git",
+      "version": "0.2.1"
+    },
+    {
       "package": "Clang_C",
       "reason": null,
       "repositoryURL": "https://github.com/norio-nomura/Clang_C.git",
@@ -32,16 +38,22 @@
       "version": "0.8.0"
     },
     {
+      "package": "Pbxproj",
+      "reason": null,
+      "repositoryURL": "https://github.com/toshi0383/Pbxproj.git",
+      "version": "0.2.0-rc2"
+    },
+    {
       "package": "Result",
       "reason": null,
       "repositoryURL": "https://github.com/antitypical/Result.git",
-      "version": "3.2.1"
+      "version": "3.2.2"
     },
     {
       "package": "SWXMLHash",
       "reason": null,
       "repositoryURL": "https://github.com/drmohundro/SWXMLHash.git",
-      "version": "3.0.4"
+      "version": "3.1.0"
     },
     {
       "package": "SourceKit",
@@ -53,7 +65,7 @@
       "package": "SourceKitten",
       "reason": null,
       "repositoryURL": "https://github.com/jpsim/SourceKitten.git",
-      "version": "0.17.2"
+      "version": "0.17.4"
     },
     {
       "package": "Sourcery",
