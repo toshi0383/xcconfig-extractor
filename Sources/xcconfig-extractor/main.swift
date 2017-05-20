@@ -22,8 +22,9 @@ let main = command(
     Argument<Path>("DIR", description: "Output directory of xcconfig files. Mkdirs if missing. Files are overwritten."),
     Flag("no-trim-duplicates", description: "Don't extract duplicated lines to common xcconfig files, simply map each buildSettings to one file.", default: false),
     Flag("no-edit-pbxproj", description: "Do not modify pbxproj.", default: false),
-    Flag("include-existing", description: "`#include` already configured xcconfigs.", default: true)
-) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit, isIncludeExisting in
+    Flag("include-existing", description: "`#include` already configured xcconfigs.", default: true),
+    Flag("preserve-configured", description: "Replace existing xcconfig configured on Xcode. Ignored if `--no-edit-pbxproj` is true.", default: false)
+) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit, isIncludeExisting, isPreserveConfigured in
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
     guard pbxprojPath.isFile else {
@@ -148,32 +149,37 @@ let main = command(
         try write(to: r.path, lines: formatter.format(result: r))
     }
 
-    // Remove buildSettings from pbxproj
     if isNoEdit {
         return
     }
-
-    let contents: String = try pbxprojPath.read()
-
-    var result: [String] = []
-    var skip = false
-    let tabs = "\t\t\t"
-    let spaces = "         "
-    let allLines = contents.characters.split(separator: "\n", omittingEmptySubsequences: false)
-    for line in allLines {
-        let l = String(line)
-        if l == "\(tabs)buildSettings = {" || l == "\(spaces)buildSettings = {" {
-            result.append(l)
-            skip = true
-        } else if skip == true && (l == "\(tabs)};" || l == "\(spaces)};") {
-            result.append(l)
-            skip = false
-        } else if skip == false {
-            result.append(l)
+    // Remove buildSettings from pbxproj and Setup xcconfigs
+    try! pbxproj.rootObject.mainGroup.addFiles(paths: [dirPath.string])
+    for configuration in pbxproj.rootObject.buildConfigurationList.buildConfigurations {
+        configuration.buildSettings = [:]
+        if isPreserveConfigured {
+            continue
+        }
+        if let fileref = pbxproj.fileReferences(named: "\(configuration.name).xcconfig").first  {
+            configuration.baseConfigurationReference = fileref
+        } else {
+            printStdError("Failed to locate xcconfig")
         }
     }
-    if allLines.count != result.count {
-        try pbxprojPath.write(result.joined(separator: "\n"))
+    for target in pbxproj.targets {
+        for configuration in target.buildConfigurationList.buildConfigurations {
+            configuration.buildSettings = [:]
+            if isPreserveConfigured {
+                continue
+            }
+            if let fileref = pbxproj.fileReferences(named: "\(target.name)-\(configuration.name).xcconfig").first {
+                configuration.baseConfigurationReference = fileref
+            }
+        }
+    }
+    do {
+        try pbxproj.write(path: pbxprojPath.string)
+    } catch {
+        printStdError("Failed to save pbxproj.")
     }
 }
 

@@ -8,6 +8,7 @@
 
 import Foundation
 import PathKit
+import AsciiPlistParser
 
 public func compare(_ l: Any, _ r: Any) -> Bool {
     switch l {
@@ -43,6 +44,10 @@ public func compare(_ l: Any, _ r: Any) -> Bool {
 public func convertToLines(_ dictionary: [String: Any]) -> [String] {
     let result = dictionary.map { (k, v) -> String in
         switch v {
+        case let s as StringValue:
+            return "\(k) = \(s.value)"
+        case let s as [StringValue]:
+            return "\(k) = \(s.map{$0.value}.joined(separator: " "))"
         case let s as String:
             return "\(k) = \(s)"
         case let s as [String]:
