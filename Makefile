@@ -2,6 +2,9 @@
 SOURCERY ?= ./.build/debug/sourcery
 PARAM = SWIFTPM_DEVELOPMENT=YES
 
+test:
+	$(PARAM) swift test
+
 update:
 	$(PARAM) swift package update
 
