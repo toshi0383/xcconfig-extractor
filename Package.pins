@@ -5,7 +5,7 @@
       "package": "AsciiPlistParser",
       "reason": null,
       "repositoryURL": "https://github.com/toshi0383/AsciiPlistParser.git",
-      "version": "0.2.2"
+      "version": "0.3.0-rc3"
     },
     {
       "package": "Clang_C",
@@ -41,7 +41,7 @@
       "package": "Pbxproj",
       "reason": null,
       "repositoryURL": "https://github.com/toshi0383/Pbxproj.git",
-      "version": "0.2.0-rc3"
+      "version": "0.2.0-rc4"
     },
     {
       "package": "Result",
@@ -65,7 +65,7 @@
       "package": "SourceKitten",
       "reason": null,
       "repositoryURL": "https://github.com/jpsim/SourceKitten.git",
-      "version": "0.17.4"
+      "version": "0.17.6"
     },
     {
       "package": "Sourcery",
