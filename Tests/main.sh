@@ -13,6 +13,8 @@ set +e
 dir=${PWD}
 for proj in $(find Fixtures -name "*xcodeproj")
 do
+    echo "=============================="
+    echo $proj
     proj=${dir}/${proj}
     cd ${proj}/..
     tmpdir="${PWD}/tmp/xcconfig-extractor-configs"
