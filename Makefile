@@ -1,4 +1,4 @@
-.PHONY = update bootstrap sourcery
+.PHONY = update build bootstrap sourcery
 SOURCERY ?= ./.build/debug/sourcery
 PARAM = SWIFTPM_DEVELOPMENT=YES
 
@@ -8,8 +8,10 @@ test:
 update:
 	$(PARAM) swift package update
 
-bootstrap:
+build:
 	$(PARAM) swift build
+
+bootstrap: build
 	$(PARAM) swift package generate-xcodeproj
 	# todo: Add fixtures to xcodeproj
 sourcery:
