@@ -2,7 +2,7 @@
 set -eo pipefail
 basedir=$(cd $(dirname $0); pwd)
 cd $basedir/..
-swift build
+make build
 XCCONFIG_EXTRACTOR=${PWD}/.build/debug/xcconfig-extractor
 if [ ! -x $XCCONFIG_EXTRACTOR ];then
     echo Executable not found!: $XCCONFIG_EXTRACTOR
