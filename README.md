@@ -44,6 +44,16 @@ $ diff before after # should prints nothing!
 If output changed, you should manually fix it. (e.g. by adding missing variable to target's(top level) xcconfig.)  
 [This article](https://pewpewthespells.com/blog/xcconfig_guide.html#BuildSettingInheritance) is helpful to understand how inheritance works.
 
+# Install
+## Binary
+- Download binary from releases page.
+- `chmod +x ~/Downloaded/xcconfig-extractor`
+- Put the executable where ever you want.
+
+## Build from source
+- Clone this repo and run `swift build -c release`.  
+- Executable will be created at `.build/release/xcconfig-extractor`.
+
 # TODOs
 - Add More Tests
 
