@@ -162,7 +162,7 @@ let main = command(
         if let fileref = pbxproj.fileReferences(named: "\(configuration.name).xcconfig").first  {
             if configuration.baseConfigurationReference != nil {
                 if let existingPath = configuration.baseConfigurationReference?.fullPath {
-                    printStdError("Replacing existing xcconfig: \(existingPath)")
+                    printWarning("Replacing existing xcconfig: \(existingPath)")
                 }
             }
             configuration.baseConfigurationReference = fileref
@@ -179,7 +179,7 @@ let main = command(
             if let fileref = pbxproj.fileReferences(named: "\(target.name)-\(configuration.name).xcconfig").first {
                 if configuration.baseConfigurationReference != nil {
                     if let existingPath = configuration.baseConfigurationReference?.fullPath {
-                        printStdError("Replacing existing xcconfig: \(existingPath)")
+                        printWarning("Replacing existing xcconfig: \(existingPath)")
                     }
                 }
                 configuration.baseConfigurationReference = fileref
