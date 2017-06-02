@@ -10,13 +10,14 @@ var isDevelopment: Bool {
 let package = Package(
     name: "xcconfig-extractor",
     targets: [
-        Target(name: "xcconfig-extractor", dependencies: ["PBXProj", "Utilities"]),
+        Target(name: "xcconfig-extractor", dependencies: ["Utilities"]),
         Target(name: "Utilities"),
     ],
     dependencies: {
         var deps: [Package.Dependency] = [
             .Package(url: "https://github.com/kylef/Commander.git", majorVersion: 0),
             .Package(url: "https://github.com/kylef/PathKit.git", majorVersion: 0),
+            .Package(url: "https://github.com/toshi0383/Pbxproj.git", majorVersion: 0),
         ]
         if isDevelopment {
             deps += [

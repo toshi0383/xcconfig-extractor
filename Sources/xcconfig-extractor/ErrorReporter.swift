@@ -9,7 +9,11 @@
 import Foundation
 
 func printStdError(_ message: String) {
-    fputs("\(ANSI.red)\(message)\(ANSI.reset)", stderr)
+    fputs("\(ANSI.red)\(message)\(ANSI.reset)\n", stderr)
+}
+
+func printWarning(_ message: String) {
+    fputs("\(ANSI.yellow)\(message)\(ANSI.reset)\n", stdout)
 }
 
 private enum ANSI : String, CustomStringConvertible {
