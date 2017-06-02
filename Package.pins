@@ -41,7 +41,7 @@
       "package": "Pbxproj",
       "reason": null,
       "repositoryURL": "https://github.com/toshi0383/Pbxproj.git",
-      "version": "0.2.0-rc6"
+      "version": "0.2.0"
     },
     {
       "package": "Result",
