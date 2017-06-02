@@ -23,8 +23,8 @@ let main = command(
     Flag("no-trim-duplicates", description: "Don't extract duplicated lines to common xcconfig files, simply map each buildSettings to one file.", default: false),
     Flag("no-edit-pbxproj", description: "Do not modify pbxproj.", default: false),
     Flag("include-existing", description: "`#include` already configured xcconfigs.", default: true),
-    Flag("preserve-configured", description: "Replace existing xcconfig configured on Xcode. Ignored if `--no-edit-pbxproj` is true.", default: false)
-) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit, isIncludeExisting, isPreserveConfigured in
+    Flag("no-set-configurations", description: "Do not set xcconfig(baseConfigurationReference) in pbxproj. Ignored if `--no-edit-pbxproj` is true.", default: false)
+) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit, isIncludeExisting, isNoSetConfigurations in
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
     guard pbxprojPath.isFile else {
@@ -156,10 +156,15 @@ let main = command(
     try! pbxproj.rootObject.mainGroup.addFiles(paths: [dirPath.normalize().string])
     for configuration in pbxproj.rootObject.buildConfigurationList.buildConfigurations {
         configuration.buildSettings = [:]
-        if configuration.baseConfigurationReference != nil && isPreserveConfigured {
+        if isNoSetConfigurations {
             continue
         }
         if let fileref = pbxproj.fileReferences(named: "\(configuration.name).xcconfig").first  {
+            if configuration.baseConfigurationReference != nil {
+                if let existingPath = configuration.baseConfigurationReference?.fullPath {
+                    printStdError("Replacing existing xcconfig: \(existingPath)")
+                }
+            }
             configuration.baseConfigurationReference = fileref
         } else {
             printStdError("Failed to locate xcconfig")
@@ -168,11 +173,18 @@ let main = command(
     for target in pbxproj.targets {
         for configuration in target.buildConfigurationList.buildConfigurations {
             configuration.buildSettings = [:]
-            if configuration.baseConfigurationReference != nil && isPreserveConfigured {
+            if isNoSetConfigurations {
                 continue
             }
             if let fileref = pbxproj.fileReferences(named: "\(target.name)-\(configuration.name).xcconfig").first {
+                if configuration.baseConfigurationReference != nil {
+                    if let existingPath = configuration.baseConfigurationReference?.fullPath {
+                        printStdError("Replacing existing xcconfig: \(existingPath)")
+                    }
+                }
                 configuration.baseConfigurationReference = fileref
+            } else {
+                printStdError("Failed to locate xcconfig")
             }
         }
     }
