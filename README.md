@@ -14,8 +14,7 @@ $ xcconfig-extractor /path/to/Your.xcodeproj Configurations
 
 This will create xcconfig files under `Configuration` dir. Configurations are removed from `buildSettings` section of pbxproj.
 
-Currently you have to add xcconfigs to your project manually.
-Make sure you setup each configurations correctly on Xcode.
+Generated xcconfigs are added to your project automatically. ✏️
 
 ![xcode's general tab](images/xcode-configuration-sample.png)
 
@@ -23,8 +22,9 @@ Make sure you setup each configurations correctly on Xcode.
 ```bash
 Options:
     --no-trim-duplicates [default: false] - Don't extract duplicated lines to common xcconfig files, simply map each buildSettings to one file.
-    --no-edit-pbxproj [default: false] - Do not modify pbxproj.
+    --no-edit-pbxproj [default: false] - Do not modify pbxproj at all.
     --include-existing [default: true] - `#include` already configured xcconfigs.
+    --no-set-configurations [default: false] - Do not set xcconfig(baseConfigurationReference) in pbxproj. Ignored if `--no-edit-pbxproj` is true.
 ```
 
 # Build Setting Validation

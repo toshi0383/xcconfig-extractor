@@ -1,3 +1,8 @@
+## master
+* Modify pbxproj using toshi0383/Pbxproj  
+  [Toshihiro Suzuki](https://github.com/toshi0383)
+  [#13](https://github.com/toshi0383/xcconfig-extractor/pull/13)
+
 ## 0.3.2
 * Fix Trim Bug  
   [Toshihiro Suzuki](https://github.com/toshi0383)
