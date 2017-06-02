@@ -1,4 +1,4 @@
-## master
+## 0.4.0
 * Modify pbxproj using toshi0383/Pbxproj  
   [Toshihiro Suzuki](https://github.com/toshi0383)
   [#13](https://github.com/toshi0383/xcconfig-extractor/pull/13)
