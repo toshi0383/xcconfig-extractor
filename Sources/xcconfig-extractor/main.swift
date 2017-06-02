@@ -153,7 +153,7 @@ let main = command(
         return
     }
     // Remove buildSettings from pbxproj and Setup xcconfigs
-    try! pbxproj.rootObject.mainGroup.addFiles(paths: [dirPath.string])
+    try! pbxproj.rootObject.mainGroup.addFiles(paths: [dirPath.normalize().string])
     for configuration in pbxproj.rootObject.buildConfigurationList.buildConfigurations {
         configuration.buildSettings = [:]
         if isPreserveConfigured {
