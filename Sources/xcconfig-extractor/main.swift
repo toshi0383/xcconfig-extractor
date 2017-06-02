@@ -21,7 +21,7 @@ let main = command(
     Argument<Path>("PATH", description: "xcodeproj file", validator: dirExists),
     Argument<Path>("DIR", description: "Output directory of xcconfig files. Mkdirs if missing. Files are overwritten."),
     Flag("no-trim-duplicates", description: "Don't extract duplicated lines to common xcconfig files, simply map each buildSettings to one file.", default: false),
-    Flag("no-edit-pbxproj", description: "Do not modify pbxproj.", default: false),
+    Flag("no-edit-pbxproj", description: "Do not modify pbxproj at all.", default: false),
     Flag("include-existing", description: "`#include` already configured xcconfigs.", default: true),
     Flag("no-set-configurations", description: "Do not set xcconfig(baseConfigurationReference) in pbxproj. Ignored if `--no-edit-pbxproj` is true.", default: false)
 ) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit, isIncludeExisting, isNoSetConfigurations in
