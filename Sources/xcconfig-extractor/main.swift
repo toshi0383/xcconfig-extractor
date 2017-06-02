@@ -156,7 +156,7 @@ let main = command(
     try! pbxproj.rootObject.mainGroup.addFiles(paths: [dirPath.normalize().string])
     for configuration in pbxproj.rootObject.buildConfigurationList.buildConfigurations {
         configuration.buildSettings = [:]
-        if isPreserveConfigured {
+        if configuration.baseConfigurationReference != nil && isPreserveConfigured {
             continue
         }
         if let fileref = pbxproj.fileReferences(named: "\(configuration.name).xcconfig").first  {
@@ -168,7 +168,7 @@ let main = command(
     for target in pbxproj.targets {
         for configuration in target.buildConfigurationList.buildConfigurations {
             configuration.buildSettings = [:]
-            if isPreserveConfigured {
+            if configuration.baseConfigurationReference != nil && isPreserveConfigured {
                 continue
             }
             if let fileref = pbxproj.fileReferences(named: "\(target.name)-\(configuration.name).xcconfig").first {
