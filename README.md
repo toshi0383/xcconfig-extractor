@@ -58,6 +58,12 @@ So make sure you either
 or
 - Quit using `agvtool` and fallback to other tools like `/usr/libexec/PlistBuddy` to update Info.plist.
 
+e.g.
+```
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(git describe --tags --abbrev=0)" App/Info.plist
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${BITRISE_BUILD_NUMBER}-${BITRISE_GIT_BRANCH}" App/Info.plist
+```
+
 # Install
 ## Build from source
 - Clone this repo and run `swift build -c release`.  
