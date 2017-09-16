@@ -32,7 +32,7 @@ Options:
 
 `xcconfig-extractor` is a refactoring tool. It shouldn't affect your App's actual "Build Setting".  
 
-Recommended way to check Build Settings is to run command like below. Make sure outputs does not change between before and after.
+Recommended way to check Build Settings is to use `xcodebuild` command. Make sure outputs does not change between before and after.
 
 ```bash
 $ xcodebuild -showBuildSettings -configuration Release > before
@@ -50,7 +50,7 @@ xcconfig does not allow any `$(inherited)` from `#include`ing xcconfigs. (See: h
 ⚠️ ***Waring*** ⚠️
 
 If you use `agvtool` for automatic versioning, it won't work after applying `xcconfig-extractor`.  
-`agvtool` updates versions correctly iff `INFOPLIST_FILE` is configured in Xcode's buildSettings section. It does not work when `INFOPLIST_FILE` is configured via xcconfig.
+`agvtool` updates versions correctly iff `INFOPLIST_FILE` is configured in Xcode's buildSettings section.
 
 So make sure you either
 - Restore `INFOPLIST_FILE` in Xcode's buildSettings section.
@@ -59,7 +59,7 @@ or
 - Quit using `agvtool` and fallback to other tools like `/usr/libexec/PlistBuddy` to update Info.plist.
 
 e.g.
-```
+```bash
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $(git describe --tags --abbrev=0)" App/Info.plist
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${BITRISE_BUILD_NUMBER}-${BITRISE_GIT_BRANCH}" App/Info.plist
 ```
@@ -75,9 +75,6 @@ bash <(curl -sL https://raw.githubusercontent.com/toshi0383/scripts/master/swift
 ## Build from source
 - Clone this repo and run `swift build -c release`.  
 - Executable will be created at `.build/release/xcconfig-extractor`.
-
-# TODOs
-- Add More Tests
 
 # License
 MIT
