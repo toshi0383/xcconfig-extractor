@@ -1,31 +1,21 @@
-// swift-tools-version:3.1
+// swift-tools-version:4.2
+// Managed by ice
 
-import Foundation
 import PackageDescription
-
-var isDevelopment: Bool {
-	return ProcessInfo.processInfo.environment["SWIFTPM_DEVELOPMENT"] == "YES"
-}
 
 let package = Package(
     name: "xcconfig-extractor",
-    targets: [
-        Target(name: "xcconfig-extractor", dependencies: ["Utilities"]),
-        Target(name: "Utilities"),
+    products: [
+        .executable(name: "xcconfig-extractor", targets: ["xcconfig-extractor"]),
     ],
-    dependencies: {
-        var deps: [Package.Dependency] = [
-            .Package(url: "https://github.com/kylef/Commander.git", majorVersion: 0),
-            .Package(url: "https://github.com/kylef/PathKit.git", majorVersion: 0),
-            .Package(url: "https://github.com/toshi0383/Pbxproj.git", majorVersion: 0),
-        ]
-        if isDevelopment {
-            deps += [
-                .Package(url: "https://github.com/krzysztofzablocki/Sourcery.git", majorVersion: 0, minor: 6),
-            ]
-        }
-        return deps
-    }(),
-    exclude: ["Resources/SourceryTemplates"]
+    dependencies: [
+        .package(url: "https://github.com/kylef/PathKit", from: "0.9.2"),
+        .package(url: "https://github.com/kylef/Commander", from: "0.8.0"),
+        .package(url: "https://github.com/tuist/xcodeproj", from: "6.3.0"),
+    ],
+    targets: [
+        .target(name: "xcconfig-extractor", dependencies: ["Utilities", "PathKit", "Commander", "xcodeproj"]),
+        .target(name: "Utilities", dependencies: ["xcodeproj", "PathKit", "Commander"]),
+        .testTarget(name: "UtilitiesTests", dependencies: ["Utilities"]),
+    ]
 )
-
