@@ -1,10 +1,11 @@
 # xcconfig-extractor
-Refactor buildSettings into xcconfigs with one shot🚀
+Refactor buildSettings into xcconfigs.
 
-[![Build Status](https://www.bitrise.io/app/9823e204182ddb41.svg?token=hychUqBHuvhZfzLLl2Ehiw&branch=master)](https://www.bitrise.io/app/9823e204182ddb41)
+[![Build Status](https://app.bitrise.io/app/31197448d2a1080e/status.svg?token=_xOjshR6oPSWAMcHBH3rqg&branch=master)](https://app.bitrise.io/app/31197448d2a1080e)
+[![patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bePatron?u=13627375)
 
 # Requirements
-- Xcode8+ is officially supported, but should work against older ones too.
+- Xcode10+ is officially supported, but should work against older ones too.
 
 # Usage
 
@@ -65,16 +66,23 @@ e.g.
 ```
 
 # Install
-## install.sh
+## Binary install
 I've written install/release scripts for SwiftPM executable.  
 This should be the easiest way.
 ```
 bash <(curl -sL https://raw.githubusercontent.com/toshi0383/scripts/master/swiftpm/install.sh) toshi0383/xcconfig-extractor
 ```
 
+Or go to the [release page](https://github.com/toshi0383/xcconfig-extractor/releases) and download `xcconfig-extractor.zip` go download the standalone binary manually.
+
 ## Build from source
 - Clone this repo and run `swift build -c release`.  
 - Executable will be created at `.build/release/xcconfig-extractor`.
+
+# Donate
+If you think it's a useful tool, consider donation to maintain project.
+
+[![patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bePatron?u=13627375)
 
 # License
 MIT

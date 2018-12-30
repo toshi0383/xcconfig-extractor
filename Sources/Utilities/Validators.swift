@@ -1,14 +1,5 @@
-//
-//  Validators.swift
-//  xcconfig-extractor
-//
-//  Created by Toshihiro Suzuki on 2017/04/27.
-//  Copyright © 2017 Toshihiro Suzuki. All rights reserved.
-//
-
-import Foundation
-
 import Commander
+import Foundation
 import PathKit
 
 public func checkPath(type: String, assertion: @escaping (Path) -> Bool) -> ((Path) throws -> Path) {

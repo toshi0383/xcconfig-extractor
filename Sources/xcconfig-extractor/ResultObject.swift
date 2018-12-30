@@ -1,15 +1,7 @@
-//
-//  ResultObject.swift
-//  xcconfig-extractor
-//
-//  Created by Toshihiro Suzuki on 2017/04/30.
-//  Copyright © 2017 Toshihiro Suzuki. All rights reserved.
-//
-
 import Foundation
 import PathKit
 
-class ResultObject: Equatable {
+final class ResultObject: Equatable {
     let path: Path
     var settings: [String]
     let targetName: String?

@@ -1,16 +1,8 @@
-//
-//  main.swift
-//  xcconfig-extractor
-//
-//  Created by Toshihiro Suzuki on 2017/04/27.
-//  Copyright © 2017 Toshihiro Suzuki. All rights reserved.
-//
-
-import Foundation
 import Commander
+import Foundation
 import PathKit
-import Pbxproj
 import Utilities
+import xcodeproj
 
 func write(to path: Path, lines: [String] = []) throws {
     let data = (lines.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
@@ -20,10 +12,10 @@ func write(to path: Path, lines: [String] = []) throws {
 let main = command(
     Argument<Path>("PATH", description: "xcodeproj file", validator: dirExists),
     Argument<Path>("DIR", description: "Output directory of xcconfig files. Mkdirs if missing. Files are overwritten."),
-    Flag("no-trim-duplicates", description: "Don't extract duplicated lines to common xcconfig files, simply map each buildSettings to one file.", default: false),
-    Flag("no-edit-pbxproj", description: "Do not modify pbxproj at all.", default: false),
-    Flag("include-existing", description: "`#include` already configured xcconfigs.", default: true),
-    Flag("no-set-configurations", description: "Do not set xcconfig(baseConfigurationReference) in pbxproj. Ignored if `--no-edit-pbxproj` is true.", default: false)
+    Flag("no-trim-duplicates", default: false, description: "Don't extract duplicated lines to common xcconfig files, simply map each buildSettings to one file."),
+    Flag("no-edit-pbxproj", default: false, description: "Do not modify pbxproj at all."),
+    Flag("include-existing", default: false, description: "`#include` already configured xcconfigs."),
+    Flag("no-set-configurations", default: false, description: "Do not set xcconfig(baseConfigurationReference) in pbxproj. Ignored if `--no-edit-pbxproj` is true.")
 ) { xcodeprojPath, dirPath, isNoTrimDuplicates, isNoEdit, isIncludeExisting, isNoSetConfigurations in
 
     let pbxprojPath = xcodeprojPath + Path("project.pbxproj")
@@ -31,9 +23,13 @@ let main = command(
         printStdError("pbxproj not exist!: \(pbxprojPath.string)")
         exit(1)
     }
+
     let projRoot = xcodeprojPath + ".."
+
+    let dirPathComponents = dirPath.absolute().components
+
     // validate DIR
-    guard dirPath.absolute().components.starts(with: projRoot.absolute().components) else {
+    guard dirPathComponents.starts(with: projRoot.absolute().components) else {
         printStdError("Invalid DIR parameter: \(dirPath.string)\nIt must be descendant of xcodeproj's root dir: \(projRoot.string)")
         exit(1)
     }
@@ -53,10 +49,13 @@ let main = command(
     //
     // read
     //
-    guard let pbxproj = try? Pbxproj(path: pbxprojPath.string) else {
-        printStdError("Failed to parse Pbxproj")
+
+    guard let xcodeproj = try? XcodeProj(path: xcodeprojPath) else {
+        printStdError("Failed to parse xcodeproj")
         exit(1)
     }
+
+    let pbxproj = xcodeproj.pbxproj
 
     //
     // write
@@ -64,38 +63,51 @@ let main = command(
     var baseResults = [ResultObject]()
     var targetResults = [ResultObject]()
 
+    let configurations = pbxproj.rootObject!.buildConfigurationList.buildConfigurations
+
     // base
-    for configuration in pbxproj.rootObject.buildConfigurationList.buildConfigurations {
+    for configuration in configurations {
         let filePath = Path("\(dirPath.string)/\(configuration.name).xcconfig")
-        let buildSettings = configuration.buildSettings.dictionary
+        let buildSettings = configuration.buildSettings
         let lines = convertToLines(buildSettings)
         let r = ResultObject(path: filePath, settings: lines, configurationName: configuration.name)
         if config.isIncludeExisting {
-            if let fileref = configuration.baseConfigurationReference {
+            if let fileref = configuration.baseConfiguration {
                 let depth = (dirPath.components - projRoot.components).count
-                let prefix = (0..<depth).reduce("") { $0.0 + "../" }
-                r.includes = [prefix + fileref.fullPath]
+                let prefix: String = (0..<depth).map { _ in "../" }.joined()
+                guard let fullPath = try fileref.fullPath(sourceRoot: projRoot) else {
+                    fatalError("Could not establish fullPath for configuration file: \(fileref)")
+                }
+                r.includes = [prefix + fullPath.string]
             }
         }
         baseResults.append(r)
     }
 
     // targets
-    let configurations = pbxproj.rootObject.buildConfigurationList.buildConfigurations
     let configurationNames = Set(configurations.map { c in c.name })
     for target in pbxproj.targets {
         let targetName = target.name
-        for configuration in target.buildConfigurationList.buildConfigurations {
+
+        guard let targetConfigurations = target.buildConfigurationList?.buildConfigurations else {
+            printWarning("Target \(targetName) doesn't have any buildConfigurationList. Ignoring.")
+            continue
+        }
+
+        for configuration in targetConfigurations {
             let filePath = Path("\(dirPath.string)/\(targetName)-\(configuration.name).xcconfig")
-            let buildSettings = configuration.buildSettings.dictionary
+            let buildSettings = configuration.buildSettings
             let lines = convertToLines(buildSettings)
 
             let r = ResultObject(path: filePath, settings: lines, targetName: targetName, configurationName: configuration.name)
             if config.isIncludeExisting {
-                if let fileref = configuration.baseConfigurationReference {
+                if let fileref = configuration.baseConfiguration {
                     let depth = (dirPath.components - projRoot.components).count
-                    let prefix = (0..<depth).reduce("") { $0.0 + "../" }
-                    r.includes = [prefix + fileref.fullPath]
+                    let prefix: String = (0..<depth).map { _ in "../" }.joined()
+                    guard let fullPath = try fileref.fullPath(sourceRoot: projRoot) else {
+                        fatalError("Could not establish fullPath for configuration file: \(fileref)")
+                    }
+                    r.includes = [prefix + fullPath.string]
                 }
             }
             targetResults.append(r)
@@ -124,7 +136,7 @@ let main = command(
         // Trim Duplicates in target configs (e.g. App-Debug.xcconfig and App-Release.xcconfig)
         for target in pbxproj.targets {
             let filtered = targetResults
-                .filter { $0.path.components.last!.characters.starts(with: "\(target.name)-".characters) }
+                .filter { $0.path.components.last!.starts(with: "\(target.name)-") }
             let common: [String] = commonElements(filtered.map { $0.settings })
             let targetConfigPath = Path("\(dirPath.string)/\(target.name).xcconfig")
             let r = ResultObject(path: targetConfigPath, settings: common)
@@ -153,43 +165,56 @@ let main = command(
         return
     }
     // Remove buildSettings from pbxproj and Setup xcconfigs
-    try! pbxproj.rootObject.mainGroup.addFiles(paths: [dirPath.normalize().string])
-    for configuration in pbxproj.rootObject.buildConfigurationList.buildConfigurations {
+    let mainGroup = try! pbxproj.rootGroup()!
+
+    let dirPathForGroup = dirPath.isAbsolute
+        ? Path((dirPathComponents - projRoot.absolute().components).joined(separator: "/"))
+        : dirPath
+
+    let group = try mainGroup.addGroup(named: dirPathForGroup.string,
+                                       options: [GroupAddingOptions.withoutFolder]).last!
+    for file in try dirPath.children() {
+        try group.addFile(at: file, sourceTree: .absolute, sourceRoot: dirPath)
+    }
+
+    for configuration in configurations {
+
         configuration.buildSettings = [:]
         if isNoSetConfigurations {
             continue
         }
         if let fileref = pbxproj.fileReferences(named: "\(configuration.name).xcconfig").first  {
-            if configuration.baseConfigurationReference != nil {
-                if let existingPath = configuration.baseConfigurationReference?.fullPath {
+            if configuration.baseConfiguration != nil {
+                if let existingPath = try configuration.baseConfiguration?.fullPath(sourceRoot: projRoot) {
                     printWarning("Replacing existing xcconfig: \(existingPath)")
                 }
             }
-            configuration.baseConfigurationReference = fileref
+            configuration.baseConfiguration = fileref
         } else {
             printStdError("Failed to locate xcconfig")
         }
     }
     for target in pbxproj.targets {
-        for configuration in target.buildConfigurationList.buildConfigurations {
+        let configurations = target.buildConfigurationList!.buildConfigurations
+        for configuration in configurations {
             configuration.buildSettings = [:]
             if isNoSetConfigurations {
                 continue
             }
             if let fileref = pbxproj.fileReferences(named: "\(target.name)-\(configuration.name).xcconfig").first {
-                if configuration.baseConfigurationReference != nil {
-                    if let existingPath = configuration.baseConfigurationReference?.fullPath {
+                if configuration.baseConfiguration != nil {
+                    if let existingPath = try configuration.baseConfiguration?.fullPath(sourceRoot: projRoot) {
                         printWarning("Replacing existing xcconfig: \(existingPath)")
                     }
                 }
-                configuration.baseConfigurationReference = fileref
+                configuration.baseConfiguration = fileref
             } else {
                 printStdError("Failed to locate xcconfig")
             }
         }
     }
     do {
-        try pbxproj.write(path: pbxprojPath.string)
+        try pbxproj.write(path: pbxprojPath, override: true)
     } catch {
         printStdError("Failed to save pbxproj.")
     }

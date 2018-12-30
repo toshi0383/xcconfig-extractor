@@ -1,3 +1,8 @@
+## 0.5.0
+* Update codebase  
+  [Toshihiro Suzuki](https://github.com/toshi0383)
+  [#20](https://github.com/toshi0383/xcconfig-extractor/pull/20)
+
 ## 0.4.0
 * Modify pbxproj using toshi0383/Pbxproj  
   [Toshihiro Suzuki](https://github.com/toshi0383)
