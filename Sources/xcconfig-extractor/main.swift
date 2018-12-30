@@ -23,9 +23,13 @@ let main = command(
         printStdError("pbxproj not exist!: \(pbxprojPath.string)")
         exit(1)
     }
+
     let projRoot = xcodeprojPath + ".."
+
+    let dirPathComponents = dirPath.absolute().components
+
     // validate DIR
-    guard dirPath.absolute().components.starts(with: projRoot.absolute().components) else {
+    guard dirPathComponents.starts(with: projRoot.absolute().components) else {
         printStdError("Invalid DIR parameter: \(dirPath.string)\nIt must be descendant of xcodeproj's root dir: \(projRoot.string)")
         exit(1)
     }
@@ -162,7 +166,13 @@ let main = command(
     }
     // Remove buildSettings from pbxproj and Setup xcconfigs
     let mainGroup = try! pbxproj.rootGroup()!
-    let group = try mainGroup.addGroup(named: dirPath.string, options: [GroupAddingOptions.withoutFolder]).last!
+
+    let dirPathForGroup = dirPath.isAbsolute
+        ? Path((dirPathComponents - projRoot.absolute().components).joined(separator: "/"))
+        : dirPath
+
+    let group = try mainGroup.addGroup(named: dirPathForGroup.string,
+                                       options: [GroupAddingOptions.withoutFolder]).last!
     for file in try dirPath.children() {
         try group.addFile(at: file, sourceRoot: dirPath)
     }
