@@ -12,7 +12,7 @@ fi
 
 set +e
 dir=${PWD}
-for proj in $(find Fixtures -name "*xcodeproj")
+for proj in $(find Fixtures -name "*xcodeproj" | grep -v archive)
 do
     echo "=============================="
     echo $proj

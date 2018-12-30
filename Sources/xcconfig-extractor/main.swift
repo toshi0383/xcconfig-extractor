@@ -63,7 +63,7 @@ let main = command(
     var baseResults = [ResultObject]()
     var targetResults = [ResultObject]()
 
-    let configurations = pbxproj.configurationLists.filter { $0.defaultConfigurationName != nil }.map { $0.buildConfigurations }.flatMap { $0 }
+    let configurations = pbxproj.rootObject!.buildConfigurationList.buildConfigurations
 
     // base
     for configuration in configurations {
@@ -174,7 +174,7 @@ let main = command(
     let group = try mainGroup.addGroup(named: dirPathForGroup.string,
                                        options: [GroupAddingOptions.withoutFolder]).last!
     for file in try dirPath.children() {
-        try group.addFile(at: file, sourceRoot: dirPath)
+        try group.addFile(at: file, sourceTree: .absolute, sourceRoot: dirPath)
     }
 
     for configuration in configurations {
