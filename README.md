@@ -2,6 +2,7 @@
 Refactor buildSettings into xcconfigs.
 
 [![Build Status](https://app.bitrise.io/app/31197448d2a1080e/status.svg?token=_xOjshR6oPSWAMcHBH3rqg&branch=master)](https://app.bitrise.io/app/31197448d2a1080e)
+[![patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bePatron?u=13627375)
 
 # Requirements
 - Xcode10+ is officially supported, but should work against older ones too.
@@ -77,6 +78,11 @@ Or go to the [release page](https://github.com/toshi0383/xcconfig-extractor/rele
 ## Build from source
 - Clone this repo and run `swift build -c release`.  
 - Executable will be created at `.build/release/xcconfig-extractor`.
+
+# Donate
+If you think it's a useful tool, consider donation to maintain project.
+
+[![patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bePatron?u=13627375)
 
 # License
 MIT
