@@ -63,7 +63,7 @@ let main = command(
     var baseResults = [ResultObject]()
     var targetResults = [ResultObject]()
 
-    let configurations = pbxproj.buildConfigurations
+    let configurations = pbxproj.configurationLists.filter { $0.defaultConfigurationName != nil }.map { $0.buildConfigurations }.flatMap { $0 }
 
     // base
     for configuration in configurations {
@@ -195,6 +195,7 @@ let main = command(
         }
     }
     for target in pbxproj.targets {
+        let configurations = target.buildConfigurationList!.buildConfigurations
         for configuration in configurations {
             configuration.buildSettings = [:]
             if isNoSetConfigurations {
