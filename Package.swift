@@ -9,13 +9,13 @@ let package = Package(
         .executable(name: "xcconfig-extractor", targets: ["xcconfig-extractor"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/kylef/PathKit", from: "0.9.2"),
-        .package(url: "https://github.com/kylef/Commander", from: "0.8.0"),
-        .package(url: "https://github.com/tuist/xcodeproj", from: "6.3.0"),
+        .package(url: "https://github.com/kylef/PathKit", from: "1.0.0"),
+        .package(url: "https://github.com/kylef/Commander", from: "0.9.0"),
+        .package(url: "https://github.com/tuist/XcodeProj", from: "7.0.1"),
     ],
     targets: [
-        .target(name: "xcconfig-extractor", dependencies: ["Utilities", "PathKit", "Commander", "xcodeproj"]),
-        .target(name: "Utilities", dependencies: ["xcodeproj", "PathKit", "Commander"]),
+        .target(name: "xcconfig-extractor", dependencies: ["Utilities", "PathKit", "Commander", "XcodeProj"]),
+        .target(name: "Utilities", dependencies: ["XcodeProj", "PathKit", "Commander"]),
         .testTarget(name: "UtilitiesTests", dependencies: ["Utilities"]),
     ]
 )

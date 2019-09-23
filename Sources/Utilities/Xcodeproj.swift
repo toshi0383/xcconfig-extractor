@@ -1,5 +1,5 @@
 import Foundation
-import xcodeproj
+import XcodeProj
 
 extension PBXProj {
     public var targets: [PBXNativeTarget] {
