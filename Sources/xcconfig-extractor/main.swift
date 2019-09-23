@@ -2,7 +2,7 @@ import Commander
 import Foundation
 import PathKit
 import Utilities
-import xcodeproj
+import XcodeProj
 
 func write(to path: Path, lines: [String] = []) throws {
     let data = (lines.joined(separator: "\n") as NSString).data(using: String.Encoding.utf8.rawValue)!
