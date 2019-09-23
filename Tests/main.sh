@@ -4,7 +4,7 @@ set -eo pipefail
 basedir=$(cd $(dirname $0); pwd)
 cd $basedir/..
 make build
-XCCONFIG_EXTRACTOR=${PWD}/.build/x86_64-apple-macosx10.10/debug/xcconfig-extractor
+XCCONFIG_EXTRACTOR=${PWD}/.build/x86_64-apple-macosx/debug/xcconfig-extractor
 if [ ! -x $XCCONFIG_EXTRACTOR ];then
     echo Executable not found!: $XCCONFIG_EXTRACTOR
     exit 1
