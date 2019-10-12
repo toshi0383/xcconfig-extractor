@@ -125,11 +125,11 @@ let main = command(
             let filtered = targetResults
                 .filter { $0.path.components.last!.contains("-\(configurationName).xcconfig") }
             let common: [String] = commonElements(filtered.map { $0.settings })
-            let idx = baseResults.index { $0.configurationName == configurationName }!
+            let idx = baseResults.firstIndex { $0.configurationName == configurationName }!
             baseResults[idx].settings = distinctArray(common + baseResults[idx].settings)
             // Write Upper Layer Configs (e.g. App-Debug.xcconfig, AppTests-Debug.xcconfig)
             for r in filtered {
-                let idx = targetResults.index(of: r)!
+                let idx = targetResults.firstIndex(of: r)!
                 targetResults[idx].settings = r.settings - common
             }
         }
@@ -142,7 +142,7 @@ let main = command(
             let r = ResultObject(path: targetConfigPath, settings: common)
             try write(to: r.path, lines: formatter.format(result: r))
             for r in filtered {
-                let idx = targetResults.index(of: r)!
+                let idx = targetResults.firstIndex(of: r)!
                 targetResults[idx].settings = r.settings - common
                 targetResults[idx].includes += [targetConfigPath.lastComponent]
                 try write(to: r.path, lines: formatter.format(result: targetResults[idx]))
