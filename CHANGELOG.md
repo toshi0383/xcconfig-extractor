@@ -1,3 +1,12 @@
+## 0.6.0
+* Support Xcode 11  
+  [Yoon Joonghyun](https://github.com/tokijh)
+  [#22](https://github.com/toshi0383/xcconfig-extractor/pull/22)
+
+* Use `firstIndex(of:)` instead of `index(of:)`  
+  [Yoon Joonghyun](https://github.com/tokijh)
+  [#23](https://github.com/toshi0383/xcconfig-extractor/pull/23)
+
 ## 0.5.0
 * Update codebase  
   [Toshihiro Suzuki](https://github.com/toshi0383)
