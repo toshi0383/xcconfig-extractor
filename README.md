@@ -66,18 +66,12 @@ e.g.
 ```
 
 # Install
-## Binary install
-I've written install/release scripts for SwiftPM executable.  
-This should be the easiest way.
-```
-bash <(curl -sL https://raw.githubusercontent.com/toshi0383/scripts/master/swiftpm/install.sh) toshi0383/xcconfig-extractor
-```
-
-Or go to the [release page](https://github.com/toshi0383/xcconfig-extractor/releases) and download `xcconfig-extractor.zip` go download the standalone binary manually.
 
 ## [Mint](https://github.com/yonaskolb/Mint)
 
-- `mint install toshi0383/xcconfig-extractor`
+```
+mint install toshi0383/xcconfig-extractor
+```
 
 ## Build from source
 - Clone this repo and run `swift build -c release`.  
